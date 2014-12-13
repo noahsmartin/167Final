@@ -28,7 +28,7 @@ Camera camera(Vector3(0, 0, 10), Vector3(0, 0, -1), Vector3(0, 1, 0));
 Matrix4 model;
 Matrix4 ship;
 
-Mountain mountains[10];
+Mountain mountains[6];
 bool genMountains = true;
 
 void translate(Matrix4 &m, double tx, double ty, double tz)
@@ -84,29 +84,6 @@ void Window::reshapeCallback(int w, int h)
     gluPerspective(60.0, aspect, 1.0, 1000); // set perspective projection viewing frustum
     //glTranslatef(0, 0, -20);    // move camera back 20 units so that it looks at the origin (or else it's in the origin)
     glMatrixMode(GL_MODELVIEW);
-}
-
-void genMountain(Vector3* array, int start, int end, int depth) {
-    if(end <= start || end - start <= 1) {
-        return;
-    }
-    int middle = (end-start)/2;
-    middle += start;
-    if(middle == start || middle == end) {
-        return;
-    } else {
-        double rise = (array[end].y() - array[start].y());
-        double run =( array[end].x() - array[start].x());
-        Vector3 tan(-1*rise, run, 0);
-        double random = (rand() % 100 - 50) / ((double)60);
-        random = random / (depth * 2);
-        tan.scale(random);
-        array[middle] = Vector3((array[end].x() + array[start].x())/2, (array[end].y() + array[start].y())/2, 0);
-        array[middle] = array[middle] + tan;
-        depth++;
-        genMountain(array, start, middle, depth);
-        genMountain(array, middle, end, depth);
-    }
 }
 
 
@@ -224,8 +201,8 @@ void Window::loadShadowShader()
 	GLhandleARB vertexShaderHandle;
 	GLhandleARB fragmentShaderHandle;
 
-	vertexShaderHandle = loadShader("./167Final/shadow_map.vert", GL_VERTEX_SHADER);
-	fragmentShaderHandle = loadShader("./167Final/shadow_map.frag", GL_FRAGMENT_SHADER);
+	vertexShaderHandle = loadShader("/Users/Noah/Desktop/shadow_map.vert", GL_VERTEX_SHADER);
+	fragmentShaderHandle = loadShader("/Users/Noah/Desktop/shadow_map.frag", GL_FRAGMENT_SHADER);
 
 	shadowShaderId = glCreateProgramObjectARB();
 
@@ -407,13 +384,24 @@ void drawObjects(void)
 	startModel(model);
 	if (genMountains) {
 		double startY = (rand() % 100 - 50) / ((double)60);
-		for (int i = 0; i < 10; i++) {
+		for (int i = 0; i < 6; i++) {
 			mountains[i] = Mountain(4 * i - 12, 4, 2 + startY);
 			mountains[i].generate();
 			startY = mountains[i].endY;
 		}
 		genMountains = false;
 	}
+    
+    for(int i = 0; i < 6; i++) {
+        mountains[i].translate(-0.01);
+    }
+    if(mountains[0].endX <= -12) {
+        for(int i = 0; i < 5; i++) {
+            mountains[i] = mountains[i+1];
+        }
+        mountains[5] = Mountain(mountains[4].endX, 4, 2+mountains[4].endY);
+        mountains[5].generate();
+    }
 
 	glBegin(GL_QUADS);
 

@@ -24,8 +24,7 @@ Mountain::Mountain(double startX, double width, double startY) {
     double endY = (rand() % 100 - 50) / ((double)60);
     mountains[199] = Vector3(startX+width, 2+endY, 0);
     this->endY = endY;
-    mountains[0].scale(10);
-    mountains[199].scale(10);
+    endX = startX + width;
 }
 
 void Mountain::generate() {
@@ -55,17 +54,28 @@ void Mountain::genMountain(int start, int end, int depth) {
     }
 }
 
+void Mountain::translate(double dx) {
+    for (int i = 0; i < 200; i++) {
+        mountains[i].v[0] = mountains[i].x() + dx;
+    }
+    endX += dx;
+}
+
 void Mountain::draw() {
     glBegin(GL_QUADS);
-    
+    glMatrixMode(GL_MODELVIEW);
     for (int i = 0; i < 199; i++) {
         glScalef(10, 10, 10);
         glColor3f(0.0, 1.0, 0.0);
         glNormal3f(0, 0, 1);
-        glVertex3f(mountains[i].x(), mountains[i].y(), mountains[i].z());
-        glVertex3f(mountains[i].x(), 0, 0);
-        glVertex3f(mountains[i + 1].x(), 0, 0);
-        glVertex3f(mountains[i + 1].x(), mountains[i + 1].y(), mountains[i].z());
+        Vector3 start = mountains[i];
+        start.scale(8);
+        Vector3 end = mountains[i+1];
+        end.scale(8);
+        glVertex3f(start.x(), start.y(), start.z());
+        glVertex3f(start.x(), 0, 0);
+        glVertex3f(end.x(), 0, 0);
+        glVertex3f(end.x(), end.y(), end.z());
     }
     glEnd();
 }

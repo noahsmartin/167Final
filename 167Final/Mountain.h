@@ -19,6 +19,8 @@ public:
     void generate();
     void draw();
     double endY;
+    double endX;
+    void translate(double dy);
 private:
     void genMountain(int start, int end, int depth);
     Vector3 mountains[200];

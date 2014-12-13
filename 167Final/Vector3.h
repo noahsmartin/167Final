@@ -5,7 +5,7 @@
 
 class Vector3
 {
-  protected:
+  public:
     double v[3];
     
   public:

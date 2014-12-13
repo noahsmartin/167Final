@@ -24,6 +24,7 @@ int Window::height = 512;   // set window height in pixels here
 Camera camera(Vector3(0, 0, 10), Vector3(0, 0, -1), Vector3(0, 1, 0));
 
 Matrix4 model;
+Matrix4 ship;
 
 Vector3 mountains[200];
 bool genMountains = true;
@@ -32,7 +33,8 @@ bool loadOnce = true;
 
 void loadOnceF() {
     model.identity();
-    loadOnce = false;
+	ship.identity();
+	loadOnce = false;
 }
 
 void Window::idleCallback()
@@ -326,6 +328,20 @@ void startTranslate(float x, float y, float z)
 	glTranslatef(x, y, z);
 }
 
+void startModel(Matrix4 m)
+{
+	glPushMatrix();
+
+	Matrix4 modelToWorld = m;
+	modelToWorld.transpose();
+	glMultMatrixd(modelToWorld.getPointer());
+
+	glMatrixMode(GL_TEXTURE);
+	glActiveTextureARB(GL_TEXTURE7);
+	glPushMatrix();
+	glMultMatrixd(modelToWorld.getPointer());
+}
+
 void endTranslate()
 {
 	glPopMatrix();
@@ -356,11 +372,7 @@ void drawObjects(void)
 	endTranslate();
 
 	// save the current matrix
-	glPushMatrix();
-	Matrix4 modelToWorld = model;
-	modelToWorld.transpose();
-	glMultMatrixd(modelToWorld.getPointer());
-	startTranslate(0, -4, -50);
+	startModel(model);
 	if (genMountains) {
 		double startY = (rand() % 100 - 50) / ((double)60);
 		double endY = (rand() % 100 - 50) / ((double)60);
@@ -376,7 +388,6 @@ void drawObjects(void)
 	glBegin(GL_QUADS);
 
 	for (int i = 0; i < 199; i++) {
-		glScalef(10, 10, 10);
 		glColor3f(0.0, 1.0, 0.0);
 		glNormal3f(0, 0, 1);
 		glVertex3f(mountains[i].x(), mountains[i].y(), mountains[i].z());
@@ -385,7 +396,10 @@ void drawObjects(void)
 		glVertex3f(mountains[i + 1].x(), mountains[i + 1].y(), mountains[i].z());
 	}
 	glEnd();
-	glPopMatrix();
+	endTranslate();
+
+	startModel(ship);
+	glutSolidCone(3, 5, 10, 10);
 	endTranslate();
 }
 
@@ -508,13 +522,17 @@ void Window::displayCallback()
 	glutSwapBuffers();
 }
 
-void translate(double tx, double ty, double tz)
+void translate(Matrix4 &m, double tx, double ty, double tz)
 {
-    Matrix4 m;
-    m.makeTranslate(tx, ty, tz);
-    model = m * model;
+    Matrix4 temp;
+    temp.makeTranslate(tx, ty, tz);
+    m = temp * m;
 }
 
+void spawnShip() {
+	ship.makeRotateY(90);
+	translate(ship, -25, 8, -10);
+}
 
 void Window::keyboardCallback(unsigned char key, int x, int y)
 {
@@ -531,28 +549,29 @@ void Window::keyboardCallback(unsigned char key, int x, int y)
         }
         if(key == 'x')
         {
-            translate(-1, 0, 0);
+            translate(model, -1, 0, 0);
         } else if(key == 'X')
         {
-            translate(1, 0, 0);
+			translate(model, 1, 0, 0);
         } else if(key == 'y')
         {
-            translate(0, -1, 0);
+			translate(model, 0, -1, 0);
         } else if(key == 'Y')
         {
-            translate(0, 1, 0);
+			translate(model, 0, 1, 0);
         } else if(key == 'z')
         {
-            translate(0, 0, -1);
+			translate(model, 0, 0, -1);
         } else if(key == 'Z')
         {
-            translate(0, 0, 1);
+			translate(model, 0, 0, 1);
         } else if(key == 'r')
         {
             model.identity();
-        }else if(key == 'g') {
+			spawnShip();
+        } else if(key == 'g') {
             genMountains = true;
-        }
+		}
 }
 
 void Window::mouseFunc(int button, int state, int x, int y) {
@@ -565,5 +584,16 @@ void Window::motionFunc(int x, int y) {
 
 void Window::specialCallback(int key, int b, int c)
 {
-
+	 if (key == GLUT_KEY_LEFT) {
+		 translate(ship, -1, 0, 0);
+	 }
+	 else if (key == GLUT_KEY_RIGHT) {
+		 translate(ship, 1, 0, 0);
+	 }
+	 else if (key == GLUT_KEY_UP) {
+		 translate(ship, 0, 1, 0);
+	 }
+	 else if (key == GLUT_KEY_DOWN) {
+		 translate(ship, 0, -1, 0);
+	 }
 }

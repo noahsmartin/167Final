@@ -82,7 +82,7 @@ void genMountain(Vector3* array, int start, int end, int depth) {
 /*~~~~~~~~~~~~~~~~SHADOWS~~~~~~~~~~~~~~*/
 
 // Expressed as float so gluPerspective division returns a float and not 0 (640/480 != 640.0/480.0).
-#define SHADOW_MAP_RATIO 2
+#define SHADOW_MAP_RATIO 4
 
 
 //Camera position
@@ -355,6 +355,11 @@ void drawObjects(void)
 	glutSolidCube(4);
 	endTranslate();
 
+	// save the current matrix
+	glPushMatrix();
+	Matrix4 modelToWorld = model;
+	modelToWorld.transpose();
+	glMultMatrixd(modelToWorld.getPointer());
 	startTranslate(0, -4, -50);
 	if (genMountains) {
 		double startY = (rand() % 100 - 50) / ((double)60);
@@ -380,6 +385,7 @@ void drawObjects(void)
 		glVertex3f(mountains[i + 1].x(), mountains[i + 1].y(), mountains[i].z());
 	}
 	glEnd();
+	glPopMatrix();
 	endTranslate();
 }
 

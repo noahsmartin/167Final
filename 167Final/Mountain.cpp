@@ -63,7 +63,7 @@ void Mountain::translate(double dx) {
 
 void Mountain::draw() {
     glBegin(GL_QUADS);
-    glMatrixMode(GL_MODELVIEW);
+    //glMatrixMode(GL_MODELVIEW);
     for (int i = 0; i < 199; i++) {
         glScalef(10, 10, 10);
         glColor3f(0.0, 1.0, 0.0);

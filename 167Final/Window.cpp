@@ -201,8 +201,8 @@ void Window::loadShadowShader()
 	GLhandleARB vertexShaderHandle;
 	GLhandleARB fragmentShaderHandle;
 
-	vertexShaderHandle = loadShader("/Users/Noah/Desktop/shadow_map.vert", GL_VERTEX_SHADER);
-	fragmentShaderHandle = loadShader("/Users/Noah/Desktop/shadow_map.frag", GL_FRAGMENT_SHADER);
+	vertexShaderHandle = loadShader("./167Final/shadow_map.vert", GL_VERTEX_SHADER);
+	fragmentShaderHandle = loadShader("./167Final/shadow_map.frag", GL_FRAGMENT_SHADER);
 
 	shadowShaderId = glCreateProgramObjectARB();
 
@@ -272,24 +272,6 @@ void setupMatrices(float position_x, float position_y, float position_z, float l
 	gluLookAt(position_x, position_y, position_z, lookAt_x, lookAt_y, lookAt_z, 0, 1, 0);
 }
 
-
-// This update only change the position of the light.
-//int elapsedTimeCounter = 0;
-void update(void)
-{
-	for (int i = 0; i < 10; i++)
-	{
-		translate(projectile[i], 1, 0, 0);
-	}
-
-	p_light[0] = light_mvnt * cos(glutGet(GLUT_ELAPSED_TIME) / 1000.0);
-	p_light[2] = light_mvnt * sin(glutGet(GLUT_ELAPSED_TIME) / 1000.0);
-
-	//p_light[0] = light_mvnt * cos(3652/1000.0);
-	//p_light[2] = light_mvnt * sin(3652/1000.0);
-}
-
-
 void setTextureMatrix(void)
 {
 	static double modelView[16];
@@ -340,10 +322,10 @@ void startTranslate(float x, float y, float z)
 
 void startModel(Matrix4 m)
 {
-	glPushMatrix();
-
 	Matrix4 modelToWorld = m;
 	modelToWorld.transpose();
+
+	glPushMatrix();
 	glMultMatrixd(modelToWorld.getPointer());
 
 	glMatrixMode(GL_TEXTURE);
@@ -364,10 +346,10 @@ void drawObjects(void)
 	// Ground
 	glColor4f(0.3f, 0.3f, 0.3f, 1);
 	glBegin(GL_QUADS);
-	glVertex3f(-35, 2, -35);
-	glVertex3f(-35, 2, 15);
-	glVertex3f(15, 2, 15);
-	glVertex3f(15, 2, -35);
+	glVertex3f(-75, 0, -35);
+	glVertex3f(-75, 0, 15);
+	glVertex3f(75, 0, 15);
+	glVertex3f(75, 0, -35);
 	glEnd();
 
 	glColor4f(0.9f, 0.9f, 0.9f, 1);
@@ -381,36 +363,14 @@ void drawObjects(void)
 	glutSolidCube(4);
 	endTranslate();
 
+	/* gen/update mountains moved to update */
 	startModel(model);
-	if (genMountains) {
-		double startY = (rand() % 100 - 50) / ((double)60);
-		for (int i = 0; i < 6; i++) {
-			mountains[i] = Mountain(4 * i - 12, 4, 2 + startY);
-			mountains[i].generate();
-			startY = mountains[i].endY;
-		}
-		genMountains = false;
-	}
-    
-    for(int i = 0; i < 6; i++) {
-        mountains[i].translate(-0.01);
-    }
-    if(mountains[0].endX <= -12) {
-        for(int i = 0; i < 5; i++) {
-            mountains[i] = mountains[i+1];
-        }
-        mountains[5] = Mountain(mountains[4].endX, 4, 2+mountains[4].endY);
-        mountains[5].generate();
-    }
-
-	glBegin(GL_QUADS);
-
-	for (int i = 0; i < 10; i++) {
+	for (int i = 0; i < 6; i++) {
 		mountains[i].draw();
 	}
-	glEnd();
 	endTranslate();
 
+	//glUseProgramObjectARB(0);
 	startModel(ship);
 	glColor3d(1, 0, 0);
 	glutSolidCone(3, 5, 10, 10);
@@ -422,6 +382,43 @@ void drawObjects(void)
 		glutSolidSphere(1, 5, 5);
 		endTranslate();
 	}
+}
+
+// This update only change the position of the light. (NOT ANYMORE!)
+//int elapsedTimeCounter = 0;
+void update(void)
+{
+	for (int i = 0; i < 10; i++)
+	{
+		translate(projectile[i], 1, 0, 0);
+	}
+
+	if (genMountains) {
+		double startY = (rand() % 100 - 50) / ((double)60);
+		for (int i = 0; i < 6; i++) {
+			mountains[i] = Mountain(4 * i - 12, 4, 2 + startY);
+			mountains[i].generate();
+			startY = mountains[i].endY;
+		}
+		genMountains = false;
+	}
+
+	for (int i = 0; i < 6; i++) {
+		mountains[i].translate(-0.01);
+	}
+	if (mountains[0].endX <= -12) {
+		for (int i = 0; i < 5; i++) {
+			mountains[i] = mountains[i + 1];
+		}
+		mountains[5] = Mountain(mountains[4].endX, 4, 2 + mountains[4].endY);
+		mountains[5].generate();
+	}
+
+	p_light[0] = light_mvnt * cos(glutGet(GLUT_ELAPSED_TIME) / 1000.0);
+	p_light[2] = light_mvnt * sin(glutGet(GLUT_ELAPSED_TIME) / 1000.0);
+
+	//p_light[0] = light_mvnt * cos(3652/1000.0);
+	//p_light[2] = light_mvnt * sin(3652/1000.0);
 }
 
 /*~~~~~~~~~~~~~~~~SHADOWS~~~~~~~~~~~~~~*/
@@ -494,7 +491,7 @@ void Window::displayCallback()
 	glUseProgramObjectARB(0);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	glOrtho(-RENDER_WIDTH/2,RENDER_WIDTH/2,-RENDER_HEIGHT/2,RENDER_HEIGHT/2,1,20);
+	glOrtho(-Window::width / 2, Window::width / 2, -Window::height / 2, Window::height / 2, 1, 20);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	glColor4f(1,1,1,1);
@@ -504,15 +501,14 @@ void Window::displayCallback()
 	glTranslated(0,0,-1);
 	glBegin(GL_QUADS);
 	glTexCoord2d(0,0);glVertex3f(0,0,0);
-	glTexCoord2d(1,0);glVertex3f(RENDER_WIDTH/2,0,0);
-	glTexCoord2d(1,1);glVertex3f(RENDER_WIDTH/2,RENDER_HEIGHT/2,0);
-	glTexCoord2d(0,1);glVertex3f(0,RENDER_HEIGHT/2,0);
-
+	glTexCoord2d(1, 0); glVertex3f(Window::width / 2, 0, 0);
+	glTexCoord2d(1, 1); glVertex3f(Window::width / 2, Window::height / 2, 0);
+	glTexCoord2d(0, 1); glVertex3f(0, Window::height / 2, 0);
 
 	glEnd();
 	glDisable(GL_TEXTURE_2D);
 	*/
-
+	
 	glutSwapBuffers();
 }
 

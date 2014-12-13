@@ -15,6 +15,8 @@
 #include "GLee.h"
 #include <GL/glut.h>
 #endif
+#include <math.h>
+#include "Mountain.h"
 
 using namespace std;
 
@@ -25,7 +27,7 @@ Camera camera(Vector3(0, 0, 10), Vector3(0, 0, -1), Vector3(0, 1, 0));
 
 Matrix4 model;
 
-Vector3 mountains[200];
+Mountain mountains[10];
 bool genMountains = true;
 
 bool loadOnce = true;
@@ -193,8 +195,8 @@ void Window::loadShadowShader()
 	GLhandleARB vertexShaderHandle;
 	GLhandleARB fragmentShaderHandle;
 
-	vertexShaderHandle = loadShader("./167Final/shadow_map.vert", GL_VERTEX_SHADER);
-	fragmentShaderHandle = loadShader("./167Final/shadow_map.frag", GL_FRAGMENT_SHADER);
+	vertexShaderHandle = loadShader("/Users/Noah/Desktop/shadow_map.vert", GL_VERTEX_SHADER);
+	fragmentShaderHandle = loadShader("/Users/Noah/Desktop/shadow_map.frag", GL_FRAGMENT_SHADER);
 
 	shadowShaderId = glCreateProgramObjectARB();
 
@@ -361,30 +363,21 @@ void drawObjects(void)
 	modelToWorld.transpose();
 	glMultMatrixd(modelToWorld.getPointer());
 	startTranslate(0, -4, -50);
-	if (genMountains) {
-		double startY = (rand() % 100 - 50) / ((double)60);
-		double endY = (rand() % 100 - 50) / ((double)60);
-		mountains[199] = Vector3(2, 2 + startY, 0);
-		mountains[199].scale(10);
-		mountains[0] = Vector3(-2, 2 + endY, 0);
-		mountains[0].scale(10);
-		genMountain(mountains, 0, 199, 1);
-
-		genMountains = false;
-	}
-
-	glBegin(GL_QUADS);
-
-	for (int i = 0; i < 199; i++) {
-		glScalef(10, 10, 10);
-		glColor3f(0.0, 1.0, 0.0);
-		glNormal3f(0, 0, 1);
-		glVertex3f(mountains[i].x(), mountains[i].y(), mountains[i].z());
-		glVertex3f(mountains[i].x(), 0, 0);
-		glVertex3f(mountains[i + 1].x(), 0, 0);
-		glVertex3f(mountains[i + 1].x(), mountains[i + 1].y(), mountains[i].z());
-	}
-	glEnd();
+    if (genMountains) {
+        double startY = (rand() % 100 - 50) / ((double)60);
+        for(int i = 0; i < 10; i++) {
+            mountains[i] = Mountain(4*i-12, 4, 2+startY);
+            mountains[i].generate();
+            startY = mountains[i].endY;
+        }
+        genMountains = false;
+    }
+    
+    glBegin(GL_QUADS);
+    
+    for (int i = 0; i < 10; i++) {
+        mountains[i].draw();
+    }
 	glPopMatrix();
 	endTranslate();
 }
@@ -397,33 +390,6 @@ void Window::displayCallback()
     glMatrixMode(GL_MODELVIEW);  // make sure we're in Modelview mode
     glDisable(GL_LIGHTING);
     
-    Matrix4 modelToWorld = camera.getMatrix() * model;
-    modelToWorld.transpose();
-    glLoadIdentity();
-    glLoadMatrixd(modelToWorld.getPointer());
-    
-    if(genMountains) {
-        double startY = (rand() % 100 - 50) / ((double)60);
-        double endY = (rand() % 100 - 50) / ((double)60);
-        mountains[199] = Vector3(2, 2+startY, 0);
-        mountains[0] = Vector3(-2, 2+endY, 0);
-        genMountain(mountains, 0, 199, 1);
-        
-        genMountains = false;
-    }
-    
-    glBegin(GL_QUADS);
-    
-    for(int i = 0; i < 199; i++) {
-        glColor3f(0.0, 1.0, 0.0);
-        glNormal3f(0, 0, 1);
-        glVertex3f(mountains[i].x(), mountains[i].y(), mountains[i].z());
-        glVertex3f(mountains[i].x(), 0, 0);
-        glVertex3f(mountains[i+1].x(), 0, 0);
-        glVertex3f(mountains[i+1].x(), mountains[i+1].y(), mountains[i].z());
-    }
-    glEnd();
-
     glFlush();
     glutSwapBuffers();*/
 

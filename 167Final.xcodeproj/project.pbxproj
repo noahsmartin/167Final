@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4F8F05C11A3BAAA700EEC828 /* Mountain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4F8F05BF1A3BAAA700EEC828 /* Mountain.cpp */; };
 		4FF03BA71A3B75CE001EEFB0 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4FF03BA61A3B75CE001EEFB0 /* main.cpp */; };
 		4FF03BAE1A3B75DC001EEFB0 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4FF03BAD1A3B75DC001EEFB0 /* GLUT.framework */; };
 		4FF03BB41A3B762B001EEFB0 /* image_DXT.c in Sources */ = {isa = PBXBuildFile; fileRef = 4FF03BAF1A3B762B001EEFB0 /* image_DXT.c */; };
@@ -35,6 +36,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		4F8F05BF1A3BAAA700EEC828 /* Mountain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Mountain.cpp; sourceTree = "<group>"; };
+		4F8F05C01A3BAAA700EEC828 /* Mountain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Mountain.h; sourceTree = "<group>"; };
 		4FF03BA31A3B75CE001EEFB0 /* 167Final */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = 167Final; sourceTree = BUILT_PRODUCTS_DIR; };
 		4FF03BA61A3B75CE001EEFB0 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		4FF03BAD1A3B75DC001EEFB0 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = System/Library/Frameworks/GLUT.framework; sourceTree = SDKROOT; };
@@ -100,6 +103,8 @@
 				4FF03BCF1A3B77EC001EEFB0 /* Camera.h */,
 				4FF03BA61A3B75CE001EEFB0 /* main.cpp */,
 				4FF03BCB1A3B76CC001EEFB0 /* Window.cpp */,
+				4F8F05BF1A3BAAA700EEC828 /* Mountain.cpp */,
+				4F8F05C01A3BAAA700EEC828 /* Mountain.h */,
 				4FF03BCC1A3B76CC001EEFB0 /* Window.h */,
 				4FF03BAF1A3B762B001EEFB0 /* image_DXT.c */,
 				4FF03BB01A3B762B001EEFB0 /* image_DXT.h */,
@@ -188,6 +193,7 @@
 				4FF03BC91A3B764B001EEFB0 /* Vector3.cpp in Sources */,
 				4FF03BC81A3B764B001EEFB0 /* stb_image_aug.c in Sources */,
 				4FF03BC71A3B764B001EEFB0 /* SOIL.c in Sources */,
+				4F8F05C11A3BAAA700EEC828 /* Mountain.cpp in Sources */,
 				4FF03BC51A3B764B001EEFB0 /* Matrix4.cpp in Sources */,
 				4FF03BB41A3B762B001EEFB0 /* image_DXT.c in Sources */,
 				4FF03BA71A3B75CE001EEFB0 /* main.cpp in Sources */,
@@ -312,6 +318,7 @@
 				4FF03BAC1A3B75CE001EEFB0 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

@@ -8,6 +8,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 #include <iostream>
 #ifdef __APPLE__
 #include <GLUT/glut.h>
@@ -54,7 +55,14 @@ int main(int argc, char *argv[])
     glutSpecialFunc(Window::specialCallback);
     glutMouseFunc(Window::mouseFunc);
     glutMotionFunc(Window::motionFunc);
-    
+	
+	// force to full screen for generateShadowFBO which requires screen width/height
+	glutFullScreen();
+	Window::width = glutGet(GLUT_SCREEN_WIDTH);
+	Window::height = glutGet(GLUT_SCREEN_HEIGHT);
+	Window::generateShadowFBO();
+	Window::loadShadowShader();
+
     glutMainLoop();
 
     return 0;

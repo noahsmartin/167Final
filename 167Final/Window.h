@@ -26,6 +26,8 @@ public:
     static void mouseFunc(int button, int state, int x, int y);
     static void motionFunc(int x, int y);
     static Vector3 getVector(int x, int y);
+	static void generateShadowFBO();
+	static void loadShadowShader();
 };
 
 #endif /* defined(___67Final__Window__) */

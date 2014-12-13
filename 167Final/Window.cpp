@@ -31,17 +31,37 @@ Matrix4 ship;
 Mountain mountains[10];
 bool genMountains = true;
 
+void translate(Matrix4 &m, double tx, double ty, double tz)
+{
+	Matrix4 temp;
+	temp.makeTranslate(tx, ty, tz);
+	m = temp * m;
+}
+
+void spawnShip() {
+	ship.makeRotateY(90);
+	translate(ship, -25, 8, -10);
+}
+
+Matrix4 projectile[10];
+int proj_index = 0;
+
+void shoot() {
+	projectile[proj_index++] = ship;
+	if (proj_index == 10)
+	{
+		proj_index = 0;
+	}
+}
+
 bool loadOnce = true;
 
 void loadOnceF() {
 	model.identity();
-	Matrix4 temp;
-	temp.makeTranslate(0, 0, -30);
-	model = temp * model;
+	translate(model, 0, 0, -30);
 
 	ship.makeRotateY(90);
-	temp.makeTranslate(-25, 8, -10);
-	ship = temp * ship;
+	translate(ship, -25, 8, -10);
 
 	loadOnce = false;
 }
@@ -280,6 +300,10 @@ void setupMatrices(float position_x, float position_y, float position_z, float l
 //int elapsedTimeCounter = 0;
 void update(void)
 {
+	for (int i = 0; i < 10; i++)
+	{
+		translate(projectile[i], 1, 0, 0);
+	}
 
 	p_light[0] = light_mvnt * cos(glutGet(GLUT_ELAPSED_TIME) / 1000.0);
 	p_light[2] = light_mvnt * sin(glutGet(GLUT_ELAPSED_TIME) / 1000.0);
@@ -403,6 +427,13 @@ void drawObjects(void)
 	glColor3d(1, 0, 0);
 	glutSolidCone(3, 5, 10, 10);
 	endTranslate();
+
+	for (int i = 0; i < 10; i++) {
+		startModel(projectile[i]);
+		glColor3d(0, 0, 1);
+		glutSolidSphere(1, 5, 5);
+		endTranslate();
+	}
 }
 
 /*~~~~~~~~~~~~~~~~SHADOWS~~~~~~~~~~~~~~*/
@@ -497,18 +528,6 @@ void Window::displayCallback()
 	glutSwapBuffers();
 }
 
-void translate(Matrix4 &m, double tx, double ty, double tz)
-{
-    Matrix4 temp;
-    temp.makeTranslate(tx, ty, tz);
-    m = temp * m;
-}
-
-void spawnShip() {
-	ship.makeRotateY(90);
-	translate(ship, -25, 8, -10);
-}
-
 void Window::keyboardCallback(unsigned char key, int x, int y)
 {
         if(key == 's')
@@ -547,6 +566,8 @@ void Window::keyboardCallback(unsigned char key, int x, int y)
 			spawnShip();
         } else if(key == 'g') {
             genMountains = true;
+		} else if (key == 32) {
+			shoot();
 		}
 }
 

@@ -15,6 +15,8 @@
 #include "GLee.h"
 #include <GL/glut.h>
 #endif
+#include <math.h>
+#include "Mountain.h"
 
 using namespace std;
 
@@ -26,14 +28,21 @@ Camera camera(Vector3(0, 0, 10), Vector3(0, 0, -1), Vector3(0, 1, 0));
 Matrix4 model;
 Matrix4 ship;
 
-Vector3 mountains[200];
+Mountain mountains[10];
 bool genMountains = true;
 
 bool loadOnce = true;
 
 void loadOnceF() {
-    model.identity();
-	ship.identity();
+	model.identity();
+	Matrix4 temp;
+	temp.makeTranslate(0, 0, -30);
+	model = temp * model;
+
+	ship.makeRotateY(90);
+	temp.makeTranslate(-25, 8, -10);
+	ship = temp * ship;
+
 	loadOnce = false;
 }
 
@@ -371,34 +380,27 @@ void drawObjects(void)
 	glutSolidCube(4);
 	endTranslate();
 
-	// save the current matrix
 	startModel(model);
 	if (genMountains) {
 		double startY = (rand() % 100 - 50) / ((double)60);
-		double endY = (rand() % 100 - 50) / ((double)60);
-		mountains[199] = Vector3(2, 2 + startY, 0);
-		mountains[199].scale(10);
-		mountains[0] = Vector3(-2, 2 + endY, 0);
-		mountains[0].scale(10);
-		genMountain(mountains, 0, 199, 1);
-
+		for (int i = 0; i < 10; i++) {
+			mountains[i] = Mountain(4 * i - 12, 4, 2 + startY);
+			mountains[i].generate();
+			startY = mountains[i].endY;
+		}
 		genMountains = false;
 	}
 
 	glBegin(GL_QUADS);
 
-	for (int i = 0; i < 199; i++) {
-		glColor3f(0.0, 1.0, 0.0);
-		glNormal3f(0, 0, 1);
-		glVertex3f(mountains[i].x(), mountains[i].y(), mountains[i].z());
-		glVertex3f(mountains[i].x(), 0, 0);
-		glVertex3f(mountains[i + 1].x(), 0, 0);
-		glVertex3f(mountains[i + 1].x(), mountains[i + 1].y(), mountains[i].z());
+	for (int i = 0; i < 10; i++) {
+		mountains[i].draw();
 	}
 	glEnd();
 	endTranslate();
 
 	startModel(ship);
+	glColor3d(1, 0, 0);
 	glutSolidCone(3, 5, 10, 10);
 	endTranslate();
 }
@@ -411,33 +413,6 @@ void Window::displayCallback()
     glMatrixMode(GL_MODELVIEW);  // make sure we're in Modelview mode
     glDisable(GL_LIGHTING);
     
-    Matrix4 modelToWorld = camera.getMatrix() * model;
-    modelToWorld.transpose();
-    glLoadIdentity();
-    glLoadMatrixd(modelToWorld.getPointer());
-    
-    if(genMountains) {
-        double startY = (rand() % 100 - 50) / ((double)60);
-        double endY = (rand() % 100 - 50) / ((double)60);
-        mountains[199] = Vector3(2, 2+startY, 0);
-        mountains[0] = Vector3(-2, 2+endY, 0);
-        genMountain(mountains, 0, 199, 1);
-        
-        genMountains = false;
-    }
-    
-    glBegin(GL_QUADS);
-    
-    for(int i = 0; i < 199; i++) {
-        glColor3f(0.0, 1.0, 0.0);
-        glNormal3f(0, 0, 1);
-        glVertex3f(mountains[i].x(), mountains[i].y(), mountains[i].z());
-        glVertex3f(mountains[i].x(), 0, 0);
-        glVertex3f(mountains[i+1].x(), 0, 0);
-        glVertex3f(mountains[i+1].x(), mountains[i+1].y(), mountains[i].z());
-    }
-    glEnd();
-
     glFlush();
     glutSwapBuffers();*/
 
@@ -568,6 +543,7 @@ void Window::keyboardCallback(unsigned char key, int x, int y)
         } else if(key == 'r')
         {
             model.identity();
+			translate(model, 0, 0, -30);
 			spawnShip();
         } else if(key == 'g') {
             genMountains = true;

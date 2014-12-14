@@ -17,6 +17,8 @@
 #endif
 #include <math.h>
 #include "Mountain.h"
+#include "main.h"
+#include "SOIL.h"
 
 using namespace std;
 
@@ -150,9 +152,6 @@ float light_mvnt = 50.0f;
 // Hold id of the framebuffer for light POV rendering
 GLuint fboId;
 
-// Z values will be rendered to this texture when using fboId framebuffer
-GLuint depthTextureId;
-
 // Use to activate/disable shadowShader
 GLhandleARB shadowShaderId;
 GLuint shadowMapUniform;
@@ -239,8 +238,8 @@ void Window::loadShadowShader()
 	GLhandleARB vertexShaderHandle;
 	GLhandleARB fragmentShaderHandle;
 
-	vertexShaderHandle = loadShader("./167Final/shadow_map.vert", GL_VERTEX_SHADER);
-	fragmentShaderHandle = loadShader("./167Final/shadow_map.frag", GL_FRAGMENT_SHADER);
+	vertexShaderHandle = loadShader("/Users/Noah/Documents/167Final/167Final/shadow_map.vert", GL_VERTEX_SHADER);
+	fragmentShaderHandle = loadShader("/Users/Noah/Documents/167Final/167Final/shadow_map.frag", GL_FRAGMENT_SHADER);
 
 	shadowShaderId = glCreateProgramObjectARB();
 
@@ -261,8 +260,7 @@ void Window::generateShadowFBO()
 	GLenum FBOstatus;
 
 	// Try to use a texture depth component
-	glGenTextures(1, &depthTextureId);
-	glBindTexture(GL_TEXTURE_2D, depthTextureId);
+	glBindTexture(GL_TEXTURE_2D, Globals::textures[1]);
 
 	// GL_LINEAR does not make sense for depth texture. However, next tutorial shows usage of GL_LINEAR and PCF
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -289,7 +287,7 @@ void Window::generateShadowFBO()
 	glReadBuffer(GL_NONE);
 
 	// attach the texture to FBO depth attachment point
-	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_TEXTURE_2D, depthTextureId, 0);
+	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_TEXTURE_2D, Globals::textures[1], 0);
 
 	// check FBO status
 	FBOstatus = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
@@ -538,10 +536,7 @@ void Window::displayCallback()
 	glUseProgramObjectARB(shadowShaderId);
 	glUniform1iARB(shadowMapUniform, 7);
 	glActiveTextureARB(GL_TEXTURE7);
-	glBindTexture(GL_TEXTURE_2D, depthTextureId);
-
-
-
+	glBindTexture(GL_TEXTURE_2D, Globals::textures[1]);
 
 
 
@@ -549,6 +544,24 @@ void Window::displayCallback()
 
 	glCullFace(GL_BACK);
 	drawObjects();
+    
+    glActiveTextureARB(GL_TEXTURE0);
+    
+    glBindTexture(GL_TEXTURE_2D, Globals::textures[0]);
+    glUseProgramObjectARB(0);
+    glDisable(GL_LIGHTING);
+    glBegin(GL_QUADS);
+    
+    glColor3f(1, 1, 1);
+    
+    // specify texture coordinates for each vertex
+    // note that textures are stored "upside down"
+    glTexCoord2f(0, 1); glVertex3f(-50, 0, -31);
+    glTexCoord2f(1, 1); glVertex3f(50, 0, -31);
+    glTexCoord2f(1, 0); glVertex3f(50, 38, -31);
+    glTexCoord2f(0, 0); glVertex3f(-50, 38, -31);
+    
+    glEnd();
 
 	// DEBUG only. this piece of code draw the depth buffer onscreen
 	/*

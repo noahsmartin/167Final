@@ -17,6 +17,36 @@
 #endif
 
 #include "Window.h"
+#include "SOIL.h"
+#include "main.h"
+
+namespace Globals {
+    GLuint textures[2] = {0};
+}
+
+void loadTexture() {
+    int channels;
+    unsigned char* data;
+    int width, height;
+    
+    glGenTextures(2, &Globals::textures[0]);
+    
+    data = SOIL_load_image("/Users/Noah/Downloads/SkyBoxSet1/SunSet/SunSetBack2048.png",  &width, &height, &channels, SOIL_LOAD_AUTO);
+    
+    glBindTexture(GL_TEXTURE_2D, Globals::textures[0]);
+    
+    glTexImage2D(GL_TEXTURE_2D, 0, 3, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+    
+    // Make sure no bytes are padded:
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    
+    // Select GL_MODULATE to mix texture with polygon color for shading:
+    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+    
+    // Use bilinear interpolation:
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+}
 
 int main(int argc, char *argv[])
 {
@@ -28,6 +58,8 @@ int main(int argc, char *argv[])
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);   // open an OpenGL context with double buffering, RGB colors, and depth buffering
     glutInitWindowSize(Window::width, Window::height);      // set initial window size
     glutCreateWindow("167 Final Project");    	      // open window and set window title
+    
+    loadTexture();
     
     
     glEnable(GL_DEPTH_TEST);            	      // enable depth buffering

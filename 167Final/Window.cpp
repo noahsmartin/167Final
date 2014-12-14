@@ -100,10 +100,10 @@ float p_camera[3] = { 0, 10, 20 };
 float l_camera[3] = { 0, 5, -10 };
 
 //Light position
-float p_light[3] = { 3, 20, 0 };
+float p_light[3] = { 0, 20, 0 };
 
 //Light lookAt
-float l_light[3] = { 0, 0, -5 };
+float l_light[3] = { 0, 0, 0 };
 
 
 //Light mouvement circle radius
@@ -377,10 +377,16 @@ void drawObjects(void)
 	endTranslate();
 
 	for (int i = 0; i < 10; i++) {
-		startModel(projectile[i]);
+		//startModel(projectile[i]);
+
+		Matrix4 modelToWorld = projectile[i];
+		modelToWorld.transpose();
+		glPushMatrix();
+		glMultMatrixd(modelToWorld.getPointer());
 		glColor3d(0, 0, 1);
 		glutSolidSphere(1, 5, 5);
-		endTranslate();
+		glPopMatrix();
+		//endTranslate();
 	}
 }
 

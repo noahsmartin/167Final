@@ -43,9 +43,18 @@ int main(int argc, char *argv[])
     glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0);
     glEnable(GL_LIGHT1);
-    glEnable(GL_NORMALIZE);
+	glEnable(GL_NORMALIZE);
+
+	float specular[] = { 1.0, 1.0, 1.0, 1.0 };
+	float shininess[] = { 100.0 };
+	// Generate material properties:
+	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, specular);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, shininess);
+	glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
+	glEnable(GL_COLOR_MATERIAL);
     
-    
+	float position[] = { 10.0, 5.0, 0.0, 1.0 };
+	glLightfv(GL_LIGHT0, GL_POSITION, position);
     
     // Install callback functions:
     glutDisplayFunc(Window::displayCallback);

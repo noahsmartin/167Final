@@ -30,7 +30,8 @@ Camera camera(Vector3(0, 0, 10), Vector3(0, 0, -1), Vector3(0, 1, 0));
 Matrix4 model;
 Matrix4 ship;
 
-Mountain mountains[6];
+const int num_mountains = 10;
+Mountain mountains[num_mountains];
 bool genMountains = true;
 
 void translate(Matrix4 &m, double tx, double ty, double tz)
@@ -238,8 +239,8 @@ void Window::loadShadowShader()
 	GLhandleARB vertexShaderHandle;
 	GLhandleARB fragmentShaderHandle;
 
-	vertexShaderHandle = loadShader("/Users/Noah/Documents/167Final/167Final/shadow_map.vert", GL_VERTEX_SHADER);
-	fragmentShaderHandle = loadShader("/Users/Noah/Documents/167Final/167Final/shadow_map.frag", GL_FRAGMENT_SHADER);
+	vertexShaderHandle = loadShader("./167Final/shadow_map.vert", GL_VERTEX_SHADER);
+	fragmentShaderHandle = loadShader("./167Final/shadow_map.frag", GL_FRAGMENT_SHADER);
 
 	shadowShaderId = glCreateProgramObjectARB();
 
@@ -401,12 +402,12 @@ void drawObjects(void)
 
 	/* gen/update mountains moved to update */
 	startModel(model);
-	for (int i = 0; i < 6; i++) {
+	for (int i = 0; i < num_mountains; i++) {
 		mountains[i].draw();
 	}
 	endTranslate();
 
-	glUseProgramObjectARB(0);
+	//glUseProgramObjectARB(0);
 	startModel(ship);
 	glColor3d(1, 0, 0);
 	glutSolidCube(2);
@@ -455,23 +456,23 @@ void update(void)
 
 	if (genMountains) {
 		double startY = (rand() % 100 - 50) / ((double)60);
-		for (int i = 0; i < 6; i++) {
-			mountains[i] = Mountain(4 * i - 12, 4, 2 + startY);
+		for (int i = 0; i < num_mountains; i++) {
+			mountains[i] = Mountain(4 * i - 20, 4, 2 + startY);
 			mountains[i].generate();
 			startY = mountains[i].endY;
 		}
 		genMountains = false;
 	}
 
-	for (int i = 0; i < 6; i++) {
+	for (int i = 0; i < num_mountains; i++) {
 		mountains[i].translate(-0.01);
 	}
-	if (mountains[0].endX <= -12) {
-		for (int i = 0; i < 5; i++) {
+	if (mountains[0].endX <= -20) {
+		for (int i = 0; i < num_mountains - 1; i++) {
 			mountains[i] = mountains[i + 1];
 		}
-		mountains[5] = Mountain(mountains[4].endX, 4, 2 + mountains[4].endY);
-		mountains[5].generate();
+		mountains[num_mountains - 1] = Mountain(mountains[num_mountains - 2].endX, 4, 2 + mountains[num_mountains - 2].endY);
+		mountains[num_mountains - 1].generate();
 	}
 
 	//p_light[0] = light_mvnt * cos(glutGet(GLUT_ELAPSED_TIME) / 1000.0);
@@ -556,10 +557,11 @@ void Window::displayCallback()
     
     // specify texture coordinates for each vertex
     // note that textures are stored "upside down"
-    glTexCoord2f(0, 1); glVertex3f(-50, 0, -31);
-    glTexCoord2f(1, 1); glVertex3f(50, 0, -31);
-    glTexCoord2f(1, 0); glVertex3f(50, 38, -31);
-    glTexCoord2f(0, 0); glVertex3f(-50, 38, -31);
+	double sc = 3;
+	glTexCoord2f(0, 1); glVertex3f(-50 * sc, 0, -31 * sc);
+	glTexCoord2f(1, 1); glVertex3f(50 * sc, 0, -31 * sc);
+	glTexCoord2f(1, 0); glVertex3f(50 * sc, 38 * sc, -31 * sc);
+	glTexCoord2f(0, 0); glVertex3f(-50 * sc, 38 * sc, -31 * sc);
     
     glEnd();
 
@@ -572,8 +574,8 @@ void Window::displayCallback()
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	glColor4f(1,1,1,1);
-	glActiveTextureARB(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D,depthTextureId);
+	glActiveTextureARB(GL_TEXTURE7);
+	glBindTexture(GL_TEXTURE_2D, Globals::textures[1]);
 	glEnable(GL_TEXTURE_2D);
 	glTranslated(0,0,-1);
 	glBegin(GL_QUADS);

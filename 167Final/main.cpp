@@ -31,7 +31,7 @@ void loadTexture() {
     
     glGenTextures(2, &Globals::textures[0]);
     
-    data = SOIL_load_image("/Users/Noah/Downloads/SkyBoxSet1/SunSet/SunSetBack2048.png",  &width, &height, &channels, SOIL_LOAD_AUTO);
+    data = SOIL_load_image("./167Final/SunSetBack2048.png",  &width, &height, &channels, SOIL_LOAD_AUTO);
     
     glBindTexture(GL_TEXTURE_2D, Globals::textures[0]);
     
@@ -85,7 +85,7 @@ int main(int argc, char *argv[])
 	glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
 	glEnable(GL_COLOR_MATERIAL);
     
-	float position[] = { 10.0, 5.0, 0.0, 1.0 };
+	float position[] = { 80.0, 800.0, 0.0, 1.0 };
 	glLightfv(GL_LIGHT0, GL_POSITION, position);
     
     // Install callback functions:

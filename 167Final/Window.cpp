@@ -49,41 +49,50 @@ void spawnShip() {
 	translate(ship, -25, 8, -10);
 }
 
-const int max_asteroids = 20;
-float asteroids_radius = 1;
+const int max_proj = 20;
+float proj_radius = 0.5;
+Matrix4 projectile[max_proj];
+int proj_index = 0;
+
+const int max_asteroids = 10;
+float asteroids_radius = 3;
 Matrix4 asteroids[max_asteroids];
 Vector3 asteroids_vel[max_asteroids];
-int asteroids_index = 0;
 
-Vector3 gravity(0, -0.0098, 0);
+Vector3 gravity(0, -0.00098, 0);
 
-void asteroid() {
-	asteroids[asteroids_index].makeTranslate(40 + (rand() % 10), 30 + (rand() % 60 + 30), -10 + (rand() % 10));
-	asteroids_vel[asteroids_index].scale(0);
-	asteroids_vel[asteroids_index].setx(-(double)(rand() % 100) / 100);
-	translate(asteroids[asteroids_index++], 2, 0, 0);
-	if (asteroids_index == max_asteroids)
-	{
-		asteroids_index = 0;
-	}
+void asteroid(int i) {
+	asteroids[i].makeTranslate(75 + (rand() % 10), (rand() % 60 + 10), -10/* + (rand() % 10)*/);
+	asteroids_vel[i].scale(0);
+	asteroids_vel[i].setx(-(double)(rand() % 50 + 25) / 100);
 }
 
 void updateAsteroids() {
 	for (int i = 0; i < max_asteroids; i++) {
 		asteroids_vel[i] = asteroids_vel[i] + gravity;
-		translate(asteroids[i], asteroids_vel[i].x() / 2, asteroids_vel[i].y() / 2, asteroids_vel[i].z());
+		translate(asteroids[i], asteroids_vel[i].x(), asteroids_vel[i].y(), 0/*asteroids_vel[i].z()*/);
 
-		if (asteroids[i].getPointer()[7] < -10)
+		Vector3 position(asteroids[i].getPointer()[3], asteroids[i].getPointer()[7], asteroids[i].getPointer()[11]);
+		for (int k = 0; k < max_proj; k++) {
+			Vector3 proj(projectile[k].getPointer()[3], projectile[k].getPointer()[7], projectile[k].getPointer()[11]);
+			if ((position - proj).length() < asteroids_radius) {
+				asteroid(i);
+				projectile[k].makeScale(0, 0, 0);
+			}
+		}
+
+		Vector3 jet(ship.getPointer()[3], ship.getPointer()[7], ship.getPointer()[11]);
+		if ((position - jet).length() < asteroids_radius) {
+			asteroid(i);
+			ship.makeScale(0, 0, 0);
+		}
+
+		if (asteroids[i].getPointer()[3] < -75 || asteroids[i].getPointer()[7] < -20)
 		{
-			asteroid();
+			asteroid(i);
 		}
 	}
 }
-
-const int max_proj = 20;
-float proj_radius = 0.5;
-Matrix4 projectile[max_proj];
-int proj_index = 0;
 
 void shoot() {
 	projectile[proj_index].identity();
@@ -91,6 +100,8 @@ void shoot() {
 	projectile[proj_index].getPointer()[7] = ship.getPointer()[7];
 	projectile[proj_index].getPointer()[11] = ship.getPointer()[11];
 	translate(projectile[proj_index++], 2, 0, 0);
+
+
 	if (proj_index == max_proj)
 	{
 		proj_index = 0;
@@ -106,7 +117,7 @@ void loadOnceF() {
 	spawnShip();
 
 	for (int i = 0; i < max_asteroids; i++) {
-		asteroid();
+		asteroid(i);
 	}
 
 	loadOnce = false;
@@ -388,10 +399,10 @@ void drawObjects(void)
 	// Ground
 	glColor4f(0.3f, 0.3f, 0.3f, 1);
 	glBegin(GL_QUADS);
-	glVertex3f(-75, 0, -35);
-	glVertex3f(-75, 0, 15);
-	glVertex3f(75, 0, 15);
-	glVertex3f(75, 0, -35);
+	glVertex3f(-75, -20, -35);
+	glVertex3f(-75, -20, 15);
+	glVertex3f(75, -20, 15);
+	glVertex3f(75, -20, -35);
 	glEnd();
 
 	glColor4f(0.9f, 0.9f, 0.9f, 1);

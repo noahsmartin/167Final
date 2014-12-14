@@ -18,6 +18,7 @@
 #include <math.h>
 #include "Mountain.h"
 #include "main.h"
+#include "SOIL.h"
 
 using namespace std;
 
@@ -496,13 +497,28 @@ void Window::displayCallback()
 
 
 
-
-
-
 	setupMatrices(p_camera[0], p_camera[1], p_camera[2], l_camera[0], l_camera[1], l_camera[2]);
 
 	glCullFace(GL_BACK);
 	drawObjects();
+    
+    glActiveTextureARB(GL_TEXTURE0);
+    
+    glBindTexture(GL_TEXTURE_2D, Globals::textures[0]);
+    glUseProgramObjectARB(0);
+    glDisable(GL_LIGHTING);
+    glBegin(GL_QUADS);
+    
+    glColor3f(1, 1, 1);
+    
+    // specify texture coordinates for each vertex
+    // note that textures are stored "upside down"
+    glTexCoord2f(0, 1); glVertex3f(-50, 0, -31);
+    glTexCoord2f(1, 1); glVertex3f(50, 0, -31);
+    glTexCoord2f(1, 0); glVertex3f(50, 38, -31);
+    glTexCoord2f(0, 0); glVertex3f(-50, 38, -31);
+    
+    glEnd();
 
 	// DEBUG only. this piece of code draw the depth buffer onscreen
 	/*

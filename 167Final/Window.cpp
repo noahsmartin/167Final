@@ -43,6 +43,37 @@ void spawnShip() {
 	translate(ship, -25, 8, -10);
 }
 
+const int max_asteroids = 20;
+float asteroids_radius = 1;
+Matrix4 asteroids[max_asteroids];
+Vector3 asteroids_vel[max_asteroids];
+int asteroids_index = 0;
+
+Vector3 gravity(0, -0.0098, 0);
+
+void asteroid() {
+	asteroids[asteroids_index].makeTranslate(40 + (rand() % 10), 30 + (rand() % 60 + 30), -10 + (rand() % 10));
+	asteroids_vel[asteroids_index].scale(0);
+	asteroids_vel[asteroids_index].setx(-(double)(rand() % 100) / 100);
+	translate(asteroids[asteroids_index++], 2, 0, 0);
+	if (asteroids_index == max_asteroids)
+	{
+		asteroids_index = 0;
+	}
+}
+
+void updateAsteroids() {
+	for (int i = 0; i < max_asteroids; i++) {
+		asteroids_vel[i] = asteroids_vel[i] + gravity;
+		translate(asteroids[i], asteroids_vel[i].x() / 2, asteroids_vel[i].y() / 2, asteroids_vel[i].z());
+
+		if (asteroids[i].getPointer()[7] < -10)
+		{
+			asteroid();
+		}
+	}
+}
+
 const int max_proj = 20;
 float proj_radius = 0.5;
 Matrix4 projectile[max_proj];
@@ -61,10 +92,14 @@ bool loadOnce = true;
 
 void loadOnceF() {
 	model.identity();
-	translate(model, 0, 0, -30);
+	translate(model, 0, 0, -50);
 
 	ship.makeRotateY(90);
 	translate(ship, -25, 8, -10);
+
+	for (int i = 0; i < max_asteroids; i++) {
+		asteroid();
+	}
 
 	loadOnce = false;
 }
@@ -97,20 +132,20 @@ void Window::reshapeCallback(int w, int h)
 
 
 //Camera position
-float p_camera[3] = { 0, 10, 20 };
+float p_camera[3] = { 0, 10, 50 };
 
 //Camera lookAt
 float l_camera[3] = { 0, 5, -10 };
 
 //Light position
-float p_light[3] = { 0, 20, 0 };
+float p_light[3] = { 80, 800, 0 };
 
 //Light lookAt
 float l_light[3] = { 0, 0, 0 };
 
 
 //Light mouvement circle radius
-float light_mvnt = 30.0f;
+float light_mvnt = 50.0f;
 
 // Hold id of the framebuffer for light POV rendering
 GLuint fboId;
@@ -376,13 +411,20 @@ void drawObjects(void)
 	glUseProgramObjectARB(0);
 	startModel(ship);
 	glColor3d(1, 0, 0);
-	glutSolidCone(2, 5, 10, 10);
+	glutSolidCube(2);
 	endTranslate();
 
 	for (int i = 0; i < max_proj; i++) {
 		startModel(projectile[i]);
 		glColor3d(0, 0, 1);
 		glutSolidSphere(proj_radius, 10, 10);
+		endTranslate();
+	}
+
+	for (int i = 0; i < max_asteroids; i++) {
+		startModel(asteroids[i]);
+		glColor3d(0, 0, 1);
+		glutSolidSphere(asteroids_radius, 10, 10);
 		endTranslate();
 	}
 }
@@ -411,6 +453,7 @@ void update(void)
 	{
 		translate(projectile[i], 1, 0, 0);
 	}
+	updateAsteroids();
 
 	if (genMountains) {
 		double startY = (rand() % 100 - 50) / ((double)60);
@@ -433,10 +476,10 @@ void update(void)
 		mountains[5].generate();
 	}
 
-	p_light[0] = light_mvnt * cos(glutGet(GLUT_ELAPSED_TIME) / 1000.0);
-	p_light[2] = light_mvnt * sin(glutGet(GLUT_ELAPSED_TIME) / 1000.0);
-	float position[] = { p_light[0], p_light[1], p_light[2], 1.0 };
-	glLightfv(GL_LIGHT0, GL_POSITION, position);
+	//p_light[0] = light_mvnt * cos(glutGet(GLUT_ELAPSED_TIME) / 1000.0);
+	//p_light[2] = light_mvnt * sin(glutGet(GLUT_ELAPSED_TIME) / 1000.0);
+	//float position[] = { p_light[0], p_light[1], p_light[2], 1.0 };
+	//glLightfv(GL_LIGHT0, GL_POSITION, position);
 
 	//p_light[0] = light_mvnt * cos(3652/1000.0);
 	//p_light[2] = light_mvnt * sin(3652/1000.0);
@@ -567,7 +610,7 @@ void Window::keyboardCallback(unsigned char key, int x, int y)
         } else if(key == 'r')
         {
             model.identity();
-			translate(model, 0, 0, -30);
+			translate(model, 0, 0, -50);
 			spawnShip();
         } else if(key == 'g') {
             genMountains = true;

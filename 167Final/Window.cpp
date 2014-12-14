@@ -422,6 +422,8 @@ void update(void)
 
 	p_light[0] = light_mvnt * cos(glutGet(GLUT_ELAPSED_TIME) / 1000.0);
 	p_light[2] = light_mvnt * sin(glutGet(GLUT_ELAPSED_TIME) / 1000.0);
+	float position[] = { p_light[0], p_light[1], p_light[2], 1.0 };
+	glLightfv(GL_LIGHT0, GL_POSITION, position);
 
 	//p_light[0] = light_mvnt * cos(3652/1000.0);
 	//p_light[2] = light_mvnt * sin(3652/1000.0);

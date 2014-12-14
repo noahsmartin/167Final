@@ -43,6 +43,9 @@ void translate(Matrix4 &m, double tx, double ty, double tz)
 
 void spawnShip() {
 	ship.makeRotateY(90);
+	Matrix4 temp;
+	temp.makeScale(1, 0.5, 1);
+	ship = temp * ship;
 	translate(ship, -25, 8, -10);
 }
 
@@ -83,7 +86,10 @@ Matrix4 projectile[max_proj];
 int proj_index = 0;
 
 void shoot() {
-	projectile[proj_index] = ship;
+	projectile[proj_index].identity();
+	projectile[proj_index].getPointer()[3] = ship.getPointer()[3];
+	projectile[proj_index].getPointer()[7] = ship.getPointer()[7];
+	projectile[proj_index].getPointer()[11] = ship.getPointer()[11];
 	translate(projectile[proj_index++], 2, 0, 0);
 	if (proj_index == max_proj)
 	{
@@ -97,8 +103,7 @@ void loadOnceF() {
 	model.identity();
 	translate(model, 0, 0, -50);
 
-	ship.makeRotateY(90);
-	translate(ship, -25, 8, -10);
+	spawnShip();
 
 	for (int i = 0; i < max_asteroids; i++) {
 		asteroid();
@@ -410,7 +415,7 @@ void drawObjects(void)
 	//glUseProgramObjectARB(0);
 	startModel(ship);
 	glColor3d(1, 0, 0);
-	glutSolidCube(2);
+	glutSolidCone(2, 5, 10, 10);
 	endTranslate();
 
 	for (int i = 0; i < max_proj; i++) {

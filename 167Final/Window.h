@@ -23,6 +23,7 @@ public:
     static void displayCallback(void);
     static void keyboardCallback(unsigned char, int, int);
     static void specialCallback(int, int, int);
+	static void specialUpCallback(int, int, int);
     static void mouseFunc(int button, int state, int x, int y);
     static void motionFunc(int x, int y);
     static Vector3 getVector(int x, int y);

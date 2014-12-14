@@ -64,6 +64,10 @@ int main(int argc, char *argv[])
     glutSpecialFunc(Window::specialCallback);
     glutMouseFunc(Window::mouseFunc);
     glutMotionFunc(Window::motionFunc);
+
+	// Enable multiple key press
+	glutIgnoreKeyRepeat(1);
+	glutSpecialUpFunc(Window::specialUpCallback);
 	
 	// force to full screen for generateShadowFBO which requires screen width/height
 	glutFullScreen();

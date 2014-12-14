@@ -50,7 +50,7 @@ void main()
 	
  	float shadow = 1.0;
  	if (ShadowCoord.w > 0.0)
- 		shadow = distanceFromLight < shadowCoordinateWdivide.z ? 0.5 : 1.0 ;
+ 		shadow = distanceFromLight < shadowCoordinateWdivide.z ? 0.25 : 1.0 ;
   	
   	gl_FragColor = shadow * color;
 }

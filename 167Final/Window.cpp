@@ -43,12 +43,15 @@ void spawnShip() {
 	translate(ship, -25, 8, -10);
 }
 
-Matrix4 projectile[10];
+const int max_proj = 20;
+float proj_radius = 0.5;
+Matrix4 projectile[max_proj];
 int proj_index = 0;
 
 void shoot() {
-	projectile[proj_index++] = ship;
-	if (proj_index == 10)
+	projectile[proj_index] = ship;
+	translate(projectile[proj_index++], 2, 0, 0);
+	if (proj_index == max_proj)
 	{
 		proj_index = 0;
 	}
@@ -370,31 +373,41 @@ void drawObjects(void)
 	}
 	endTranslate();
 
-	//glUseProgramObjectARB(0);
+	glUseProgramObjectARB(0);
 	startModel(ship);
 	glColor3d(1, 0, 0);
-	glutSolidCone(3, 5, 10, 10);
+	glutSolidCone(2, 5, 10, 10);
 	endTranslate();
 
-	for (int i = 0; i < 10; i++) {
-		//startModel(projectile[i]);
-
-		Matrix4 modelToWorld = projectile[i];
-		modelToWorld.transpose();
-		glPushMatrix();
-		glMultMatrixd(modelToWorld.getPointer());
+	for (int i = 0; i < max_proj; i++) {
+		startModel(projectile[i]);
 		glColor3d(0, 0, 1);
-		glutSolidSphere(1, 5, 5);
-		glPopMatrix();
-		//endTranslate();
+		glutSolidSphere(proj_radius, 10, 10);
+		endTranslate();
 	}
 }
+
+bool keystates[256];
 
 // This update only change the position of the light. (NOT ANYMORE!)
 //int elapsedTimeCounter = 0;
 void update(void)
 {
-	for (int i = 0; i < 10; i++)
+	if (keystates[GLUT_KEY_LEFT]) {
+		translate(ship, -1, 0, 0);
+	}
+	else if (keystates[GLUT_KEY_RIGHT]) {
+		translate(ship, 1, 0, 0);
+	}
+
+	if (keystates[GLUT_KEY_UP]) {
+		translate(ship, 0, 1, 0);
+	}
+	else if (keystates[GLUT_KEY_DOWN]) {
+		translate(ship, 0, -1, 0);
+	}
+
+	for (int i = 0; i < max_proj; i++)
 	{
 		translate(projectile[i], 1, 0, 0);
 	}
@@ -573,16 +586,22 @@ void Window::motionFunc(int x, int y) {
 
 void Window::specialCallback(int key, int b, int c)
 {
-	 if (key == GLUT_KEY_LEFT) {
-		 translate(ship, -1, 0, 0);
-	 }
-	 else if (key == GLUT_KEY_RIGHT) {
-		 translate(ship, 1, 0, 0);
-	 }
-	 else if (key == GLUT_KEY_UP) {
-		 translate(ship, 0, 1, 0);
-	 }
-	 else if (key == GLUT_KEY_DOWN) {
-		 translate(ship, 0, -1, 0);
-	 }
+	keystates[key] = true;
+	/*if (key == GLUT_KEY_LEFT) {
+		translate(ship, -1, 0, 0);
+	}
+	else if (key == GLUT_KEY_RIGHT) {
+		translate(ship, 1, 0, 0);
+	}
+	else if (key == GLUT_KEY_UP) {
+		translate(ship, 0, 1, 0);
+	}
+	else if (key == GLUT_KEY_DOWN) {
+		translate(ship, 0, -1, 0);
+	}*/
+}
+
+void Window::specialUpCallback(int key, int b, int c)
+{
+	keystates[key] = false;
 }

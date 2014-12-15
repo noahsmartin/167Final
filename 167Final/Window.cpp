@@ -547,6 +547,7 @@ void drawObjects(void)
 	// Ground
 	glColor4f(0.3f, 0.3f, 0.3f, 1);
 	glBegin(GL_QUADS);
+  glNormal3f(0, 1.0, 0);
 	glVertex3f(-75, -20, -35);
 	glVertex3f(-75, -20, 15);
 	glVertex3f(75, -20, 15);
@@ -557,7 +558,7 @@ void drawObjects(void)
 
 	// Instead of calling glTranslatef, we need a custom function that also maintain the light matrix
 	startTranslate(0, 4, -16);
-	glutSolidCube(4);
+  glutSolidCube(4);
 	endTranslate();
 
 	startTranslate(-6, 4, -5);
@@ -675,6 +676,9 @@ void Window::displayCallback()
     glFlush();
     glutSwapBuffers();*/
 
+  
+//  loadShadowShader();
+  
 	update();
 
 	//First step: Render from the light POV to a FBO, story depth values only

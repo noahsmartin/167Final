@@ -1,8 +1,10 @@
 // Used for shadow lookup
 varying vec4 ShadowCoord;
 
-varying vec4 diffuse,ambientGlobal,ambient, ecPos;
+varying vec4 diffuse,ambientGlobal,ambient, position;
 varying vec3 normal,halfVector;
+
+varying vec3 vVertex;
  
 void main()
 {   
@@ -12,7 +14,7 @@ void main()
     normal = normalize(gl_NormalMatrix * gl_Normal);
  
     /* compute the vertex position  in camera space. */
-    ecPos = gl_ModelViewMatrix * gl_Vertex;
+    position = gl_ModelViewMatrix * gl_Vertex;
  
     /* Normalize the halfVector to pass it to the fragment shader */
     halfVector = gl_LightSource[0].halfVector.xyz;
@@ -26,5 +28,8 @@ void main()
   
 	gl_Position = ftransform();
 
+    // toon shading 
 	gl_FrontColor = gl_Color;
+    position = gl_ModelViewMatrix * gl_Vertex;
+    vVertex = gl_Vertex.xyz;
 }

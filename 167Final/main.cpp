@@ -21,7 +21,8 @@
 #include "main.h"
 
 namespace Globals {
-    GLuint textures[2] = {0};
+    GLuint textures[3] = {0};
+    Shader* shader;
 }
 
 void loadTexture() {
@@ -29,9 +30,9 @@ void loadTexture() {
     unsigned char* data;
     int width, height;
     
-    glGenTextures(2, &Globals::textures[0]);
+    glGenTextures(3, &Globals::textures[0]);
     
-    data = SOIL_load_image("./167Final/SunSetBack2048.png",  &width, &height, &channels, SOIL_LOAD_AUTO);
+    data = SOIL_load_image("/Users/Noah/Documents/167Final/167Final/SunSetBack2048.png",  &width, &height, &channels, SOIL_LOAD_AUTO);
     
     glBindTexture(GL_TEXTURE_2D, Globals::textures[0]);
     
@@ -46,6 +47,28 @@ void loadTexture() {
     // Use bilinear interpolation:
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    
+    
+    //The following code will read in our RAW file
+    
+    data = (unsigned char *) SOIL_load_image("/Users/Noah/Documents/167Final/167Final/barrenbump.jpg", &width, &height, &channels, SOIL_LOAD_AUTO);
+    
+    glBindTexture( GL_TEXTURE_CUBE_MAP, Globals::textures[2] ); //bind the texture to it’s array
+    glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, 0, 3, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+    glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, 3, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+    glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, 3, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+    glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, 0, 3, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+    glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, 0, 3, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+    glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, 3, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+    // Make sure no bytes are padded:
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    
+    // Select GL_MODULATE to mix texture with polygon color for shading:
+    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+    
+    // Use bilinear interpolation:
+    glTexParameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 }
 
 int main(int argc, char *argv[])
@@ -87,6 +110,8 @@ int main(int argc, char *argv[])
     
 	float position[] = { 80.0, 800.0, 0.0, 1.0 };
 	glLightfv(GL_LIGHT0, GL_POSITION, position);
+    
+    Globals::shader = new Shader("/Users/Noah/Documents/167Final/167Final/shader.vert", "/Users/Noah/Documents/167Final/167Final/shader.frag");
     
     // Install callback functions:
     glutDisplayFunc(Window::displayCallback);

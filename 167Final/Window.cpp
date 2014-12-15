@@ -255,8 +255,8 @@ void Window::loadShadowShader()
 	GLhandleARB vertexShaderHandle;
 	GLhandleARB fragmentShaderHandle;
 
-	vertexShaderHandle = loadShader("./167Final/shadow_map.vert", GL_VERTEX_SHADER);
-	fragmentShaderHandle = loadShader("./167Final/shadow_map.frag", GL_FRAGMENT_SHADER);
+	vertexShaderHandle = loadShader("/Users/Noah/Documents/167Final/167Final/shadow_map.vert", GL_VERTEX_SHADER);
+	fragmentShaderHandle = loadShader("/Users/Noah/Documents/167Final/167Final/shadow_map.frag", GL_FRAGMENT_SHADER);
 
 	shadowShaderId = glCreateProgramObjectARB();
 
@@ -436,12 +436,20 @@ void drawObjects(void)
 		endTranslate();
 	}
 
+    Globals::shader->bind();
+    glActiveTexture(GL_TEXTURE1);
+    glEnable(GL_TEXTURE_2D);
+    int normal_location = glGetUniformLocationARB(Globals::shader->pid, "normal_texture");
+    glUniform1i(normal_location, 1);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, Globals::textures[2]);
 	for (int i = 0; i < max_asteroids; i++) {
 		startModel(asteroids[i]);
 		glColor3d(0, 0, 1);
-		glutSolidSphere(asteroids_radius, 10, 10);
+		glutSolidSphere(asteroids_radius, 200, 200);
 		endTranslate();
 	}
+    Globals::shader->unbind();
+    
 }
 
 bool keystates[256];
@@ -563,7 +571,6 @@ void Window::displayCallback()
 	drawObjects();
     
     glActiveTextureARB(GL_TEXTURE0);
-    
     glBindTexture(GL_TEXTURE_2D, Globals::textures[0]);
     glUseProgramObjectARB(0);
     glDisable(GL_LIGHTING);
@@ -580,6 +587,14 @@ void Window::displayCallback()
 	glTexCoord2f(0, 0); glVertex3f(-50 * sc, 38 * sc, -31 * sc);
     
     glEnd();
+    
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, 0);
+    glDisable(GL_TEXTURE_2D);
+    
+    glActiveTexture(GL_TEXTURE7);
+    glBindTexture(GL_TEXTURE_2D, 0);
+    glDisable(GL_TEXTURE_2D);
 
 	// DEBUG only. this piece of code draw the depth buffer onscreen
 	/*

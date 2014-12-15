@@ -14,9 +14,11 @@
 #else
 #include <GL/glut.h>
 #endif
+#include "shader.h"
 
 namespace Globals {
-    extern GLuint textures[2];
+    extern GLuint textures[3];
+    extern Shader* shader;
 }
 
 #endif

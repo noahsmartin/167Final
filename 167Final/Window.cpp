@@ -33,6 +33,7 @@ Matrix4 ship;
 const int num_mountains = 10;
 Mountain mountains[num_mountains];
 bool genMountains = true;
+bool moving = true;
 
 void translate(Matrix4 &m, double tx, double ty, double tz)
 {
@@ -68,6 +69,10 @@ void asteroid(int i) {
 }
 
 void updateAsteroids() {
+    
+    if(!moving) {
+        return;
+    }
 	for (int i = 0; i < max_asteroids; i++) {
 		asteroids_vel[i] = asteroids_vel[i] + gravity;
 		translate(asteroids[i], asteroids_vel[i].x(), asteroids_vel[i].y(), 0/*asteroids_vel[i].z()*/);
@@ -441,7 +446,7 @@ void drawObjects(void)
     glEnable(GL_TEXTURE_2D);
     int normal_location = glGetUniformLocationARB(Globals::shader->pid, "normal_texture");
     glUniform1i(normal_location, 1);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, Globals::textures[2]);
+    glBindTexture(GL_TEXTURE_2D, Globals::textures[2]);
 	for (int i = 0; i < max_asteroids; i++) {
 		startModel(asteroids[i]);
 		glColor3d(0, 0, 1);
@@ -489,7 +494,7 @@ void update(void)
 	}
 
 	for (int i = 0; i < num_mountains; i++) {
-		mountains[i].translate(-0.01);
+		mountains[i].translate(-0.02);
 	}
 	if (mountains[0].endX <= -20) {
 		for (int i = 0; i < num_mountains - 1; i++) {
@@ -662,7 +667,9 @@ void Window::keyboardCallback(unsigned char key, int x, int y)
             genMountains = true;
 		} else if (key == 32) {
 			shoot();
-		}
+        } else if(key == 'm') {
+            moving = !moving;
+        }
 }
 
 void Window::mouseFunc(int button, int state, int x, int y) {

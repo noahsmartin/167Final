@@ -51,15 +51,10 @@ void loadTexture() {
     
     //The following code will read in our RAW file
     
-    data = (unsigned char *) SOIL_load_image("/Users/Noah/Documents/167Final/167Final/barrenbump.jpg", &width, &height, &channels, SOIL_LOAD_AUTO);
+    data = (unsigned char *) SOIL_load_image("/Users/Noah/Documents/167Final/167Final/3215-normal.jpg", &width, &height, &channels, SOIL_LOAD_AUTO);
     
-    glBindTexture( GL_TEXTURE_CUBE_MAP, Globals::textures[2] ); //bind the texture to it’s array
-    glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, 0, 3, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-    glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, 3, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-    glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, 3, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-    glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, 0, 3, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-    glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, 0, 3, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-    glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, 3, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+    glBindTexture( GL_TEXTURE_2D, Globals::textures[2] ); //bind the texture to it’s array
+    glTexImage2D(GL_TEXTURE_2D, 0, 3, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
     // Make sure no bytes are padded:
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     
@@ -67,8 +62,8 @@ void loadTexture() {
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
     
     // Use bilinear interpolation:
-    glTexParameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 }
 
 int main(int argc, char *argv[])

@@ -36,8 +36,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		4F12AFD21A3EAF100005ABF5 /* 3215-normal.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "3215-normal.jpg"; sourceTree = "<group>"; };
 		4F2623C81A3CD4AC002043B2 /* main.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = main.h; sourceTree = "<group>"; };
-		4F6799571A3E895D00F07D4E /* barrenbump.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = barrenbump.jpg; sourceTree = "<group>"; };
 		4F6799581A3E896800F07D4E /* shader.vert */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = shader.vert; sourceTree = "<group>"; };
 		4F6799591A3E896800F07D4E /* shader.frag */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = shader.frag; sourceTree = "<group>"; };
 		4F8F05BF1A3BAAA700EEC828 /* Mountain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Mountain.cpp; sourceTree = "<group>"; };
@@ -103,7 +103,7 @@
 		4FF03BA51A3B75CE001EEFB0 /* 167Final */ = {
 			isa = PBXGroup;
 			children = (
-				4F6799571A3E895D00F07D4E /* barrenbump.jpg */,
+				4F12AFD21A3EAF100005ABF5 /* 3215-normal.jpg */,
 				4F6799581A3E896800F07D4E /* shader.vert */,
 				4F6799591A3E896800F07D4E /* shader.frag */,
 				4FF03BCE1A3B77EC001EEFB0 /* Camera.cpp */,

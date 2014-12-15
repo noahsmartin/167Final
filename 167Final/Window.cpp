@@ -406,6 +406,7 @@ void startModel(Matrix4 m)
 
 void endTranslate()
 {
+  glMatrixMode(GL_TEXTURE);
 	glPopMatrix();
 	glMatrixMode(GL_MODELVIEW);
 	glPopMatrix();
@@ -558,8 +559,9 @@ void drawObjects(void)
 	}
 	endTranslate();
 
-//	glUseProgramObjectARB(0);
+//  glMatrixMode(GL_MODELVIEW);
   
+//	glUseProgramObjectARB(0);
   draw_ship();
 
 	for (int i = 0; i < max_proj; i++) {
@@ -579,17 +581,19 @@ void drawObjects(void)
     glDisable(GL_LIGHTING);
 	for (int i = 0; i < max_asteroids; i++) {
 		startModel(asteroids[i]);
-        glMatrixMode(GL_MODELVIEW);
+    glMatrixMode(GL_MODELVIEW);
         glScalef(asteroids_radius, asteroids_radius, asteroids_radius);
 		mySphere2();
 		endTranslate();
 	}
     Globals::shader->unbind();
-    
+  
+//    glMatrixMode(GL_TEXTURE);
+  
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, 0);
     glDisable(GL_TEXTURE);
-    
+  
 }
 
 bool keystates[256];

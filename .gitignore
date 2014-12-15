@@ -4,3 +4,7 @@ paths.h
 *.xcuserstate
 
 167Final.xcodeproj/project.xcworkspace/xcuserdata/Aviv.xcuserdatad/UserInterfaceState.xcuserstate
+
+*.xccheckout
+
+167Final.xcodeproj/project.xcworkspace/xcshareddata/167Final.xccheckout

@@ -32,6 +32,8 @@ Camera camera(Vector3(0, 0, 10), Vector3(0, 0, -1), Vector3(0, 1, 0));
 Matrix4 model;
 Matrix4 ship;
 
+bool bounding_sphere = false;
+
 int ship_respawn = 0;
 GLint *ints = new GLint[2];
 
@@ -51,7 +53,7 @@ void translate(Matrix4 &m, double tx, double ty, double tz)
 void spawnShip() {
 	ship.makeRotateY(90);
 	Matrix4 temp;
-	temp.makeScale(1, 0.5, 1);
+	temp.makeScale(1, 1.0, 1);
 	ship = temp * ship;
 	translate(ship, -25, 8, -10);
 }
@@ -437,7 +439,17 @@ void draw_ship() {
     
     startModel(ship);
     glColor3d(1, 0, 0);
-    glutSolidCone(2, 5, 10, 10);
+    glutSolidCone(1, 5, 10, 10);
+  
+  if (bounding_sphere) {
+    glMatrixMode(GL_MODELVIEW);
+    glTranslatef(0, 0, 2.5);
+    glScaled(1.1, 1.1, 1.1);
+    glutWireSphere(2.5, 10, 10);
+  }
+  
+  
+  
     endTranslate();
 }
 
@@ -780,6 +792,9 @@ void Window::keyboardCallback(unsigned char key, int x, int y)
             Matrix4 m;
             m.makeScale(1.1, 1.1, 1.1);
             model = model * m;
+        }
+        else if (key == 'b'){
+          bounding_sphere = !bounding_sphere;
         }
         if(key == 'x')
         {

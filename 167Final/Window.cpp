@@ -101,7 +101,7 @@ void updateAsteroids() {
 		}
 
 		Vector3 jet(ship.getPointer()[3], ship.getPointer()[7], ship.getPointer()[11]);
-		if ((position - jet).length() < asteroids_radius) {
+		if ((position - jet).length() < asteroids_radius + 2.5) {
 			asteroid(i);
       ship_respawn = 10;
 		}

@@ -8,6 +8,7 @@
 
 #include <iostream>
 #include "Camera.h"
+#include <sys/time.h>
 #include "Window.h"
 #ifdef __APPLE__
 #include <GLUT/glut.h>
@@ -31,6 +32,7 @@ Camera camera(Vector3(0, 0, 10), Vector3(0, 0, -1), Vector3(0, 1, 0));
 Matrix4 model;
 Matrix4 ship;
 
+int ship_respawn = 0;
 const int num_mountains = 10;
 Mountain mountains[num_mountains];
 bool genMountains = true;
@@ -90,7 +92,8 @@ void updateAsteroids() {
 		Vector3 jet(ship.getPointer()[3], ship.getPointer()[7], ship.getPointer()[11]);
 		if ((position - jet).length() < asteroids_radius) {
 			asteroid(i);
-			ship.makeScale(0, 0, 0);
+//			ship.makeScale(0, 0, 0);
+      ship_respawn = 10;
 		}
 
 		if (asteroids[i].getPointer()[3] < -75 || asteroids[i].getPointer()[7] < -20)
@@ -400,6 +403,35 @@ void endTranslate()
 	glPopMatrix();
 }
 
+long int time_in_ms(){
+  struct timeval tp;
+  gettimeofday(&tp, NULL);
+  return tp.tv_sec * 1000 + tp.tv_usec / 1000;
+}
+
+void draw_ship() {
+  
+  if (ship_respawn > 0) {
+    static bool on_off = false;
+    static long int last_time = 0;
+    
+    if (time_in_ms() - last_time > 250) {
+      on_off = !on_off;
+      last_time = time_in_ms();
+      ship_respawn--;
+    }
+    
+    if (on_off) {
+      return;
+    }
+  }
+  
+  startModel(ship);
+  glColor3d(1, 0, 0);
+  glutSolidCone(2, 5, 10, 10);
+  endTranslate();
+}
+
 void drawObjects(void)
 {
 	// Ground
@@ -430,10 +462,8 @@ void drawObjects(void)
 	endTranslate();
 
 	//glUseProgramObjectARB(0);
-	startModel(ship);
-	glColor3d(1, 0, 0);
-	glutSolidCone(2, 5, 10, 10);
-	endTranslate();
+  
+  draw_ship();
 
 	for (int i = 0; i < max_proj; i++) {
 		startModel(projectile[i]);

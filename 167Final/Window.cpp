@@ -455,6 +455,10 @@ void drawObjects(void)
 	}
     Globals::shader->unbind();
     
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, 0);
+    glDisable(GL_TEXTURE);
+    
 }
 
 bool keystates[256];
@@ -566,6 +570,7 @@ void Window::displayCallback()
 	glUseProgramObjectARB(shadowShaderId);
 	glUniform1iARB(shadowMapUniform, 7);
 	glActiveTextureARB(GL_TEXTURE7);
+    glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, Globals::textures[1]);
 
 
@@ -575,7 +580,8 @@ void Window::displayCallback()
 	glCullFace(GL_BACK);
 	drawObjects();
     
-    glActiveTextureARB(GL_TEXTURE0);
+    glActiveTexture(GL_TEXTURE0);
+    glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, Globals::textures[0]);
     glUseProgramObjectARB(0);
     glDisable(GL_LIGHTING);
@@ -593,7 +599,7 @@ void Window::displayCallback()
     
     glEnd();
     
-    glActiveTexture(GL_TEXTURE1);
+    glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, 0);
     glDisable(GL_TEXTURE_2D);
     

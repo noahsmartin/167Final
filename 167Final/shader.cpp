@@ -85,7 +85,7 @@ char* Shader::read(const char *filename)
 	shaderFile[size]='\0'; // eliminate the garbage at EOF
 	fclose(fp);
 
-	fprintf(stdout, "shaderfile = %s\n", shaderFile);
+//	fprintf(stdout, "shaderfile = %s\n", shaderFile);
 	return shaderFile;
 }
 

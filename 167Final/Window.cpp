@@ -148,6 +148,8 @@ void Window::idleCallback()
         loadOnceF();
     }
     displayCallback();         // call display routine to show the cube
+  
+//    Globals::shader = new Shader(BUMP_VERT_SHADER, BUMP_FRAG_SHADER);
 }
 
 void Window::reshapeCallback(int w, int h)
@@ -160,6 +162,9 @@ void Window::reshapeCallback(int w, int h)
     gluPerspective(60.0, aspect, 1.0, 1000); // set perspective projection viewing frustum
     //glTranslatef(0, 0, -20);    // move camera back 20 units so that it looks at the origin (or else it's in the origin)
     glMatrixMode(GL_MODELVIEW);
+  
+  
+
 }
 
 

@@ -25,11 +25,13 @@ varying vec3 lightVec;
 varying vec3 halfVec;
 varying vec3 eyeVec;
 varying vec3 TexCoord0;
-
+varying vec4 position;
+varying vec3 vVertex;
+varying vec3 normal_t;
 
 void main()
 {
-    
+    normal_t = normalize(gl_NormalMatrix * gl_Normal);
     TexCoord0 = gl_Normal;
     
     // Building the matrix Eye Space -> Tangent Space
@@ -37,10 +39,12 @@ void main()
     vec3 t = normalize (gl_NormalMatrix * tangent);
     vec3 b = cross (n, t);
     
-    vec3 position = vec3(gl_LightSource[0].position);
+    vec3 pos;
+    pos = vec3(gl_LightSource[0].position);
     
     vec3 vertexPosition = vec3(gl_ModelViewMatrix *  gl_Vertex);
-    vec3 lightDir = normalize(position.xyz - vertexPosition);
+    vec3 lightDir;
+    lightDir = normalize(pos.xyz - vertexPosition);
     
     
     // transform light and half angle vectors by tangent basis
@@ -74,5 +78,8 @@ void main()
     
     
     gl_Position = ftransform();
-    
+
+
+    position = gl_ModelViewMatrix * gl_Vertex;
+    vVertex = gl_Vertex.xyz;
 }

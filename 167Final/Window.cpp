@@ -92,7 +92,6 @@ void updateAsteroids() {
 		Vector3 jet(ship.getPointer()[3], ship.getPointer()[7], ship.getPointer()[11]);
 		if ((position - jet).length() < asteroids_radius) {
 			asteroid(i);
-//			ship.makeScale(0, 0, 0);
       ship_respawn = 10;
 		}
 
@@ -240,11 +239,11 @@ GLhandleARB loadShader(char* filename, unsigned int type)
 		//We failed to compile.
 		printf("Shader '%s' failed compilation.\n", filename);
 
-		/*//Attempt to get the length of our error log.
+		//Attempt to get the length of our error log.
 		glGetObjectParameterivARB(handle, GL_OBJECT_INFO_LOG_LENGTH_ARB, &errorLoglength);
 
 		//Create a buffer to read compilation error message
-		errorLogText = malloc(sizeof(char) * errorLoglength);
+		errorLogText = (char *) malloc(sizeof(char) * errorLoglength);
 
 		//Used to get the final length of the log.
 		glGetInfoLogARB(handle, errorLoglength, &actualErrorLogLength, errorLogText);
@@ -253,7 +252,7 @@ GLhandleARB loadShader(char* filename, unsigned int type)
 		printf("%s\n", errorLogText);
 
 		// Free the buffer malloced earlier
-		free(errorLogText);*/
+		free(errorLogText);
 	}
 
 	return handle;
@@ -461,7 +460,7 @@ void drawObjects(void)
 	}
 	endTranslate();
 
-	//glUseProgramObjectARB(0);
+//	glUseProgramObjectARB(0);
   
   draw_ship();
 

@@ -37,7 +37,7 @@ bool bounding_sphere = false;
 int ship_respawn = 0;
 GLint *ints = new GLint[2];
 
-
+bool PAUSE = false;
 const int num_mountains = 10;
 Mountain mountains[num_mountains];
 bool genMountains = true;
@@ -446,6 +446,8 @@ void draw_ship() {
     glColor3d(1, 0, 0);
     glutSolidCone(1, 5, 10, 10);
   
+  
+  
   if (bounding_sphere) {
     glMatrixMode(GL_MODELVIEW);
     glTranslatef(0, 0, 2.5);
@@ -638,7 +640,9 @@ void update(void)
 	{
 		translate(projectile[i], 1.2, 0, 0);
 	}
-	updateAsteroids();
+  if (!PAUSE) {
+    updateAsteroids();
+  }
 
 	if (genMountains) {
 		double startY = (rand() % 100 - 50) / ((double)60);
@@ -682,7 +686,7 @@ void Window::displayCallback()
     glutSwapBuffers();*/
 
   
-//  loadShadowShader();
+  loadShadowShader();
   
 	update();
 
@@ -804,6 +808,9 @@ void Window::keyboardCallback(unsigned char key, int x, int y)
         }
         else if (key == 'b'){
           bounding_sphere = !bounding_sphere;
+        }
+        else if (key == 'p'){
+          PAUSE = !PAUSE;
         }
         if(key == 'x')
         {

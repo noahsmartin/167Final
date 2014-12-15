@@ -33,6 +33,9 @@ Matrix4 model;
 Matrix4 ship;
 
 int ship_respawn = 0;
+GLint *ints = new GLint[2];
+
+
 const int num_mountains = 10;
 Mountain mountains[num_mountains];
 bool genMountains = true;
@@ -64,6 +67,12 @@ Matrix4 asteroids[max_asteroids];
 Vector3 asteroids_vel[max_asteroids];
 
 Vector3 gravity(0, -0.00098, 0);
+
+#define PI 3.14159
+#define DEG_TO_RAD (PI/180.0)
+#define ANG_STEP 10.0
+#define NUM_DIVS 50
+#define CACHE_SIZE 240
 
 void asteroid(int i) {
 	asteroids[i].makeTranslate(75 + (rand() % 10), (rand() % 60 + 10), -10/* + (rand() % 10)*/);
@@ -409,26 +418,115 @@ long int time_in_ms(){
 }
 
 void draw_ship() {
-  
-  if (ship_respawn > 0) {
-    static bool on_off = false;
-    static long int last_time = 0;
     
-    if (time_in_ms() - last_time > 250) {
-      on_off = !on_off;
-      last_time = time_in_ms();
-      ship_respawn--;
+    if (ship_respawn > 0) {
+        static bool on_off = false;
+        static long int last_time = 0;
+        
+        if (time_in_ms() - last_time > 250) {
+            on_off = !on_off;
+            last_time = time_in_ms();
+            ship_respawn--;
+        }
+        
+        if (on_off) {
+            return;
+        }
     }
     
-    if (on_off) {
-      return;
+    startModel(ship);
+    glColor3d(1, 0, 0);
+    glutSolidCone(2, 5, 10, 10);
+    endTranslate();
+}
+
+// Modified from http://faculty.ycp.edu/~dbabcock/PastCourses/cs370/labs/lab22.html
+// Modified from the glu source code for gluSphere() for a multi-textured unit sphere with normals
+void mySphere2()
+{
+    GLint i,j;
+    GLfloat sintheta[NUM_DIVS+1];
+    GLfloat costheta[NUM_DIVS+1];
+    GLfloat sinphi[NUM_DIVS+1];
+    GLfloat cosphi[NUM_DIVS+1];
+    GLfloat angle;
+    GLfloat sintemp1 = 0.0, sintemp2 = 0.0;
+    GLfloat costemp1 = 0.0, costemp2 = 0.0;
+    GLint slices = NUM_DIVS;
+    GLint stacks = NUM_DIVS;
+    GLfloat x,y,z;
+    GLfloat s,t;
+    GLfloat tangent[3];
+    
+    for (i = 0; i < slices; i++) {
+        angle = 2.0 * M_PI * i / slices;
+        sintheta[i] = sin(angle);
+        costheta[i] = cos(angle);
     }
-  }
-  
-  startModel(ship);
-  glColor3d(1, 0, 0);
-  glutSolidCone(2, 5, 10, 10);
-  endTranslate();
+    
+    for (j = 0; j <= stacks; j++) {
+        angle = M_PI/2.0 - M_PI * j / stacks;
+        sinphi[j] = sin(angle);
+        cosphi[j] = cos(angle);
+    }
+    /* Make sure it comes to a point */
+    cosphi[0] = 0;
+    cosphi[stacks] = 0;
+    sintheta[slices] = sintheta[0];
+    costheta[slices] = costheta[0];
+    
+    for (j = 0; j < stacks; j++) {
+        sintemp1 = sinphi[j];
+        sintemp2 = sinphi[j+1];
+        costemp1 = cosphi[j];
+        costemp2 = cosphi[j+1];
+        
+        glBegin(GL_QUAD_STRIP);
+        for (i = 0; i <= slices; i++) {
+            // Compute coordinates
+            x = costheta[i] * costemp2;
+            y = sintheta[i] * costemp2;
+            z = sintemp2;
+            s = 1 - (float) i / slices;
+            t = 1 - (float) (j+1) / stacks;
+            tangent[0] = -costheta[i]*sintemp2;
+            tangent[1] = -sintheta[i]*sintemp2;
+            tangent[2] = costemp2;
+            // Set vectors
+            glNormal3f(x,y,z);
+            //  glMultiTexCoord2f(GL_TEXTURE0,s,t);
+            // if(use_bump)
+            // {
+            glMultiTexCoord2f(GL_TEXTURE1,s,t);
+            // TODO: Set tangent vector in shader
+            glVertexAttrib3fv(ints[1], tangent);
+            
+            //}
+            glVertex3f(x,y,z);
+            
+            // Compute coordinates
+            x = costheta[i] * costemp1;
+            y = sintheta[i] * costemp1;
+            z = sintemp1;
+            s = 1 - (float) i / slices;
+            t = 1 - (float) j / stacks;
+            tangent[0] = -costheta[i]*sintemp1;
+            tangent[1] = -sintheta[i]*sintemp1;
+            tangent[2] = costemp1;
+            // Set vectors
+            glNormal3f(x,y,z);
+            //   glMultiTexCoord2f(GL_TEXTURE0,s,t);
+            //   if(use_bump)
+            //   {
+            glMultiTexCoord2f(GL_TEXTURE1,s,t);
+            // TODO: Set tangent vector in shader
+            glVertexAttrib3fv(ints[1], tangent);
+            
+            //   }
+            glVertex3f(x,y,z);
+        }
+        glEnd();
+    }
 }
 
 void drawObjects(void)
@@ -475,12 +573,15 @@ void drawObjects(void)
     glActiveTexture(GL_TEXTURE1);
     glEnable(GL_TEXTURE_2D);
     int normal_location = glGetUniformLocationARB(Globals::shader->pid, "normal_texture");
+    ints[1] = glGetAttribLocationARB(Globals::shader->pid, "tangent");
     glUniform1i(normal_location, 1);
     glBindTexture(GL_TEXTURE_2D, Globals::textures[2]);
+    glDisable(GL_LIGHTING);
 	for (int i = 0; i < max_asteroids; i++) {
 		startModel(asteroids[i]);
-		glColor3d(0, 0, 1);
-		glutSolidSphere(asteroids_radius, 200, 200);
+        glMatrixMode(GL_MODELVIEW);
+        glScalef(asteroids_radius, asteroids_radius, asteroids_radius);
+		mySphere2();
 		endTranslate();
 	}
     Globals::shader->unbind();

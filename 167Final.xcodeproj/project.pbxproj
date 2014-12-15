@@ -36,11 +36,11 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		084A15821A3F48E100B916FB /* paths.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = paths.h; path = 167Final/paths.h; sourceTree = "<group>"; };
 		4F12AFD21A3EAF100005ABF5 /* 3215-normal.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "3215-normal.jpg"; sourceTree = "<group>"; };
+		4F12AFD31A3F642A0005ABF5 /* bump_shader.frag */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = bump_shader.frag; sourceTree = "<group>"; };
+		4F12AFD41A3F643B0005ABF5 /* bump_shader.vert */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = bump_shader.vert; sourceTree = "<group>"; };
+		4F12AFD51A3F647A0005ABF5 /* paths.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = paths.h; sourceTree = "<group>"; };
 		4F2623C81A3CD4AC002043B2 /* main.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = main.h; sourceTree = "<group>"; };
-		4F6799581A3E896800F07D4E /* shader.vert */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = shader.vert; sourceTree = "<group>"; };
-		4F6799591A3E896800F07D4E /* shader.frag */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = shader.frag; sourceTree = "<group>"; };
 		4F8F05BF1A3BAAA700EEC828 /* Mountain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Mountain.cpp; sourceTree = "<group>"; };
 		4F8F05C01A3BAAA700EEC828 /* Mountain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Mountain.h; sourceTree = "<group>"; };
 		4FF03BA31A3B75CE001EEFB0 /* 167Final */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = 167Final; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -87,7 +87,7 @@
 		4FF03B9A1A3B75CE001EEFB0 = {
 			isa = PBXGroup;
 			children = (
-				084A15821A3F48E100B916FB /* paths.h */,
+				4F12AFD51A3F647A0005ABF5 /* paths.h */,
 				4FF03BAD1A3B75DC001EEFB0 /* GLUT.framework */,
 				4FF03BA51A3B75CE001EEFB0 /* 167Final */,
 				4FF03BA41A3B75CE001EEFB0 /* Products */,
@@ -106,8 +106,8 @@
 			isa = PBXGroup;
 			children = (
 				4F12AFD21A3EAF100005ABF5 /* 3215-normal.jpg */,
-				4F6799581A3E896800F07D4E /* shader.vert */,
-				4F6799591A3E896800F07D4E /* shader.frag */,
+				4F12AFD31A3F642A0005ABF5 /* bump_shader.frag */,
+				4F12AFD41A3F643B0005ABF5 /* bump_shader.vert */,
 				4FF03BCE1A3B77EC001EEFB0 /* Camera.cpp */,
 				4FF03BCF1A3B77EC001EEFB0 /* Camera.h */,
 				4FF03BA61A3B75CE001EEFB0 /* main.cpp */,

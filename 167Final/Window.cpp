@@ -19,6 +19,7 @@
 #include "Mountain.h"
 #include "main.h"
 #include "SOIL.h"
+#include "paths.h"
 
 using namespace std;
 
@@ -260,8 +261,8 @@ void Window::loadShadowShader()
 	GLhandleARB vertexShaderHandle;
 	GLhandleARB fragmentShaderHandle;
 
-	vertexShaderHandle = loadShader("/Users/Noah/Documents/167Final/167Final/shadow_map.vert", GL_VERTEX_SHADER);
-	fragmentShaderHandle = loadShader("/Users/Noah/Documents/167Final/167Final/shadow_map.frag", GL_FRAGMENT_SHADER);
+	vertexShaderHandle = loadShader(SHADOW_MAP_VERT_SHADER, GL_VERTEX_SHADER);
+	fragmentShaderHandle = loadShader(SHADOW_MAP_FRAG_SHADER, GL_FRAGMENT_SHADER);
 
 	shadowShaderId = glCreateProgramObjectARB();
 

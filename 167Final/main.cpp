@@ -6,6 +6,17 @@
 //  Copyright (c) 2014 Noah Martin. All rights reserved.
 //
 
+/*
+ Here are the #defines you need to make this work:
+ #define SHADOW_MAP_VERT_SHADER
+ #define SHADOW_MAP_FRAG_SHADER
+ #define BG_PATH
+ #define BUMP_MAP
+ #define BUMP_VERT_SHADER
+ #define BUMP_FRAG_SHADER
+ */
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -17,6 +28,7 @@
 #endif
 
 #include "Window.h"
+#include "paths.h"
 #include "SOIL.h"
 #include "main.h"
 
@@ -32,7 +44,7 @@ void loadTexture() {
     
     glGenTextures(3, &Globals::textures[0]);
     
-    data = SOIL_load_image("/Users/Noah/Documents/167Final/167Final/SunSetBack2048.png",  &width, &height, &channels, SOIL_LOAD_AUTO);
+    data = SOIL_load_image(BG_PATH,  &width, &height, &channels, SOIL_LOAD_AUTO);
     
     glBindTexture(GL_TEXTURE_2D, Globals::textures[0]);
     
@@ -51,7 +63,7 @@ void loadTexture() {
     
     //The following code will read in our RAW file
     
-    data = (unsigned char *) SOIL_load_image("/Users/Noah/Documents/167Final/167Final/3215-normal.jpg", &width, &height, &channels, SOIL_LOAD_AUTO);
+    data = (unsigned char *) SOIL_load_image(BUMP_MAP, &width, &height, &channels, SOIL_LOAD_AUTO);
     
     glBindTexture( GL_TEXTURE_2D, Globals::textures[2] ); //bind the texture to it’s array
     glTexImage2D(GL_TEXTURE_2D, 0, 3, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
@@ -106,7 +118,7 @@ int main(int argc, char *argv[])
 	float position[] = { 80.0, 800.0, 0.0, 1.0 };
 	glLightfv(GL_LIGHT0, GL_POSITION, position);
     
-    Globals::shader = new Shader("/Users/Noah/Documents/167Final/167Final/shader.vert", "/Users/Noah/Documents/167Final/167Final/shader.frag");
+    Globals::shader = new Shader(BUMP_VERT_SHADER, BUMP_FRAG_SHADER);
     
     // Install callback functions:
     glutDisplayFunc(Window::displayCallback);

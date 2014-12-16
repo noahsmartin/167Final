@@ -222,9 +222,6 @@ void Window::reshapeCallback(int w, int h)
     gluPerspective(60.0, aspect, 1.0, 1000); // set perspective projection viewing frustum
     //glTranslatef(0, 0, -20);    // move camera back 20 units so that it looks at the origin (or else it's in the origin)
     glMatrixMode(GL_MODELVIEW);
-  
-  
-
 }
 
 
@@ -770,6 +767,9 @@ void update(void)
 
 void Window::displayCallback()
 {
+    if(loadOnce) {
+        loadOnceF();
+    }
     /*glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);  // clear color and depth buffers
     glMatrixMode(GL_MODELVIEW);  // make sure we're in Modelview mode
     glDisable(GL_LIGHTING);

@@ -122,8 +122,26 @@ void updateAsteroids() {
 			if (i != k) {
 				Vector3 ast(asteroids[k].getPointer()[3], asteroids[k].getPointer()[7], asteroids[k].getPointer()[11]);
 				if ((position - ast).length() < (asteroids_radius * 2)) {
-					asteroids_vel[i].scale(-1);
-					asteroids_vel[k].scale(-1);
+                    double overlap = asteroids_radius * 2 - (position - ast).length();
+                    Vector3 v = position - ast;
+                    v.normalize();
+                    v.scale(overlap);
+                    Vector3 newAst = ast - v;
+                    asteroids[k].getPointer()[3] = newAst.v[0];
+                    asteroids[k].getPointer()[7] = newAst.v[1];
+                    asteroids[k].getPointer()[11] = newAst.v[2];
+                    
+                    newAst = position + v;
+                    asteroids[i].getPointer()[3] = newAst.v[0];
+                    asteroids[i].getPointer()[7] = newAst.v[1];
+                    asteroids[i].getPointer()[11] = newAst.v[2];
+                    
+                    Vector3 prevI = asteroids_vel[i];
+                    asteroids_vel[i] = asteroids_vel[k];
+                    asteroids_vel[k] = prevI;
+                    // Friction
+					asteroids_vel[i].scale(0.998);
+					asteroids_vel[k].scale(0.998);
 				}
 			}
 		}

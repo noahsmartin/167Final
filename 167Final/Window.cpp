@@ -40,6 +40,8 @@ bool bounding_sphere = false;
 int ship_respawn = 0;
 GLint *ints = new GLint[2];
 
+bool keystates[256];
+
 const int num_mountains = 10;
 Mountain mountains[num_mountains];
 bool genMountains = true;
@@ -71,6 +73,7 @@ void spawnShip() {
 const int max_proj = 20;
 float proj_radius = 0.5;
 Matrix4 projectile[max_proj];
+double projectile_speeds[max_proj];
 int proj_index = 0;
 
 const int max_asteroids = 10;
@@ -141,6 +144,24 @@ void shoot() {
 	projectile[proj_index].getPointer()[3] = ship.getPointer()[3];
 	projectile[proj_index].getPointer()[7] = ship.getPointer()[7];
 	projectile[proj_index].getPointer()[11] = ship.getPointer()[11];
+    projectile_speeds[proj_index] = 1.2;
+    if (keystates[GLUT_KEY_LEFT]) {
+        // This isn't really right, we just don't want the bullet to
+        // move really slow, so pretent it is fired with more initial
+        // velocity when the ship is moving backwards.
+        projectile_speeds[proj_index] -= 0.5;
+    }
+    else if (keystates[GLUT_KEY_RIGHT]) {
+        projectile_speeds[proj_index] += 1;
+    }
+    
+    if (keystates[GLUT_KEY_UP]) {
+        // TODO: set veritical velocity and add gravity to missiles
+       // translate(ship, 0, 1, 0);
+    }
+    else if (keystates[GLUT_KEY_DOWN]) {
+       // translate(ship, 0, -1, 0);
+    }
 	translate(projectile[proj_index++], 2, 0, 0);
 
 
@@ -546,7 +567,6 @@ void mySphere2()
     GLint slices = NUM_DIVS;
     GLint stacks = NUM_DIVS;
     GLfloat x,y,z;
-    GLfloat s,t;
     GLfloat tangent[3];
     
     for (i = 0; i < slices; i++) {
@@ -578,8 +598,6 @@ void mySphere2()
             x = costheta[i] * costemp1;
             y = sintheta[i] * costemp1;
             z = sintemp1;
-            s = 1 - (float) i / slices;
-            t = 1 - (float) j / stacks;
             tangent[0] = -costheta[i]*sintemp1;
             tangent[1] = -sintheta[i]*sintemp1;
             tangent[2] = costemp1;
@@ -588,7 +606,6 @@ void mySphere2()
             //   glMultiTexCoord2f(GL_TEXTURE0,s,t);
             //   if(use_bump)
             //   {
-            glMultiTexCoord2f(GL_TEXTURE1,s,t);
             // TODO: Set tangent vector in shader
             glVertexAttrib3fv(ints[1], tangent);
             
@@ -600,8 +617,6 @@ void mySphere2()
             x = costheta[i] * costemp2;
             y = sintheta[i] * costemp2;
             z = sintemp2;
-            s = 1 - (float) i / slices;
-            t = 1 - (float) (j+1) / stacks;
             tangent[0] = -costheta[i]*sintemp2;
             tangent[1] = -sintheta[i]*sintemp2;
             tangent[2] = costemp2;
@@ -610,7 +625,6 @@ void mySphere2()
             //  glMultiTexCoord2f(GL_TEXTURE0,s,t);
             // if(use_bump)
             // {
-            glMultiTexCoord2f(GL_TEXTURE1,s,t);
             // TODO: Set tangent vector in shader
             glVertexAttrib3fv(ints[1], tangent);
             
@@ -698,8 +712,6 @@ void drawObjects(void)
   
 }
 
-bool keystates[256];
-
 // This update only change the position of the light. (NOT ANYMORE!)
 //int elapsedTimeCounter = 0;
 void update(void)
@@ -720,7 +732,7 @@ void update(void)
 
 	for (int i = 0; i < max_proj; i++)
 	{
-		translate(projectile[i], 1.2, 0, 0);
+		translate(projectile[i], projectile_speeds[i], 0, 0);
 	}
     updateAsteroids();
 

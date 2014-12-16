@@ -119,14 +119,13 @@ void updateAsteroids() {
 		}
 	}
 	for (int i = 0; i < max_asteroids; i++) {
-    
-
 		Vector3 position(asteroids[i].getPointer()[3], asteroids[i].getPointer()[7], asteroids[i].getPointer()[11]);
 		for (int k = 0; k < max_proj; k++) {
 			Vector3 proj(projectile[k].getPointer()[3], projectile[k].getPointer()[7], projectile[k].getPointer()[11]);
-			if ((position - proj).length() < (asteroids_radius + proj_radius)) {
+			if ((position - proj).length() < (asteroids_radius + proj_radius) && projectile_speeds[k].x() != 0) {
 				if (!bouncing) { asteroid(i); }
 				else { asteroids_vel[i].scale(-1); }
+				projectile_speeds[k].scale(0);
 				projectile[k].makeScale(0, 0, 0);
 			}
 		}

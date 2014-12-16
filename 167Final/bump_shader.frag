@@ -87,7 +87,7 @@ void main()
     
     gl_FragColor =	diffuseMaterial * lamberFactor ;
     gl_FragColor += vec4(0.05, 0.05, 0.05, 0);
-
+/*
     // toon shading - https://github.com/mchamberlain/Cel-Shader/tree/master/shaders
 
 
@@ -131,7 +131,7 @@ void main()
   }
   else {
     gl_FragColor = diffuseMaterial * lamberFactor * intensity;
-  }
+  }*/
     
 }
 

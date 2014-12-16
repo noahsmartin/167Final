@@ -37,7 +37,6 @@ bool bounding_sphere = false;
 int ship_respawn = 0;
 GLint *ints = new GLint[2];
 
-bool PAUSE = false;
 const int num_mountains = 10;
 Mountain mountains[num_mountains];
 bool genMountains = true;
@@ -68,7 +67,7 @@ float asteroids_radius = 3;
 Matrix4 asteroids[max_asteroids];
 Vector3 asteroids_vel[max_asteroids];
 
-Vector3 gravity(0, -0.00098, 0);
+Vector3 gravity(0, -0.002, 0);
 
 #define PI 3.14159
 #define DEG_TO_RAD (PI/180.0)
@@ -640,9 +639,7 @@ void update(void)
 	{
 		translate(projectile[i], 1.2, 0, 0);
 	}
-  if (!PAUSE) {
     updateAsteroids();
-  }
 
 	if (genMountains) {
 		double startY = (rand() % 100 - 50) / ((double)60);
@@ -808,9 +805,6 @@ void Window::keyboardCallback(unsigned char key, int x, int y)
         }
         else if (key == 'b'){
           bounding_sphere = !bounding_sphere;
-        }
-        else if (key == 'p'){
-          PAUSE = !PAUSE;
         }
         if(key == 'x')
         {

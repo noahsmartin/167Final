@@ -836,7 +836,7 @@ void update(void)
 			mountains[i].generate();
 			startY = mountains[i].endY;
             
-            closeRange[i] = Mountain(4 * i - 20, 4, 2 + startYClose, 0, Vector3(0.2, 0.2, 0.2));
+            closeRange[i] = Mountain(4 * i - 20, 4, 2 + startYClose, 0, Vector3(0.5, 0.5, 0.5));
             closeRange[i].generate();
             startYClose = closeRange[i].endY;		}
 		    genMountains = false;
@@ -857,7 +857,7 @@ void update(void)
         for (int i = 0; i < num_mountains - 1; i++) {
             closeRange[i] = closeRange[i + 1];
         }
-        closeRange[num_mountains - 1] = Mountain(closeRange[num_mountains - 2].endX, 4, 2 + closeRange[num_mountains - 2].endY, 0, Vector3(0.2, 0.2, 0.2));
+        closeRange[num_mountains - 1] = Mountain(closeRange[num_mountains - 2].endX, 4, 2 + closeRange[num_mountains - 2].endY, 0, Vector3(0.5, 0.5, 0.5));
         closeRange[num_mountains - 1].generate();
     }
 

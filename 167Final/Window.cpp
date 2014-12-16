@@ -47,6 +47,7 @@ Mountain mountains[num_mountains];
 bool genMountains = true;
 bool moving = true;
 bool bouncing = false;
+bool firstperson = false;
 
 void translate(Matrix4 &m, double tx, double ty, double tz)
 {
@@ -90,20 +91,21 @@ Vector3 gravity(0, -0.002, 0);
 #define CACHE_SIZE 240
 
 void asteroid(int i) {
-	asteroids[i].makeTranslate(75 + (rand() % 10), (rand() % 60 + 10), -10/* + (rand() % 10)*/);
+	asteroids[i].makeTranslate(75 + (rand() % 10), (rand() % 60 + 10), -30 + (rand() % 30));
 	asteroids_vel[i].scale(0);
 	asteroids_vel[i].setx(-(double)(rand() % 50 + 25) / 100);
 }
 
 void updateAsteroids() {
     
-    if(!moving) {
-        return;
-    }
+    if(moving) {
+		for (int i = 0; i < max_asteroids; i++) {
+			asteroids_vel[i] = asteroids_vel[i] + gravity;
+			rotate(asteroids[i], 1.0, asteroids_vel[i].x(), asteroids_vel[i].y(), asteroids_vel[i].z());
+			translate(asteroids[i], asteroids_vel[i].x(), asteroids_vel[i].y(), 0/*asteroids_vel[i].z()*/);
+		}
+	}
 	for (int i = 0; i < max_asteroids; i++) {
-		asteroids_vel[i] = asteroids_vel[i] + gravity;
-    rotate(asteroids[i], 1.0, asteroids_vel[i].x(), asteroids_vel[i].y(), asteroids_vel[i].z());
-		translate(asteroids[i], asteroids_vel[i].x(), asteroids_vel[i].y(), 0/*asteroids_vel[i].z()*/);
     
 
 		Vector3 position(asteroids[i].getPointer()[3], asteroids[i].getPointer()[7], asteroids[i].getPointer()[11]);
@@ -162,7 +164,7 @@ void shoot() {
     else if (keystates[GLUT_KEY_DOWN]) {
         projectile_speeds[proj_index] = projectile_speeds[proj_index] - Vector3(0, 0.2, 0);
     }
-	translate(projectile[proj_index++], 2, 0, 0);
+	translate(projectile[proj_index++], 4, 0, 0);
 
 
 	if (proj_index == max_proj)
@@ -494,6 +496,38 @@ void updateParticle(int i) {
 	{
 		setupParticles(i);
 	}
+	
+	if (keystates[GLUT_KEY_LEFT]) {
+		// This isn't really right, we just don't want the bullet to
+		// move really slow, so pretent it is fired with more initial
+		// velocity when the ship is moving backwards.
+		if (firstperson)
+		{
+			particles_pos[i] = particles_pos[i] + Vector3(0, 0, 0.1);
+		}
+		else
+		{
+			particles_pos[i] = particles_pos[i] + Vector3(0.1, 0, 0);
+		}
+	}
+	else if (keystates[GLUT_KEY_RIGHT]) {
+		if (firstperson)
+		{
+			particles_pos[i] = particles_pos[i] - Vector3(0, 0, 0.1);
+		}
+		else
+		{
+			particles_pos[i] = particles_pos[i] - Vector3(0.1, 0, 0);
+		}
+	}
+
+	if (keystates[GLUT_KEY_UP]) {
+		particles_pos[i] = particles_pos[i] - Vector3(0, 0.1, 0);
+	}
+	else if (keystates[GLUT_KEY_DOWN]) {
+		particles_pos[i] = particles_pos[i] + Vector3(0, 0.1, 0);
+	}
+
 
 	particles_pos[i] = particles_pos[i] + Vector3(-0.1, -0.1 + (double)(rand() % 100) / 1000 * 2, 0);
 
@@ -669,10 +703,13 @@ void drawObjects(void)
   draw_ship();
 
 	for (int i = 0; i < max_proj; i++) {
-		startModel(projectile[i]);
-		glColor3d(0, 0, 1);
-		glutSolidSphere(proj_radius, 10, 10);
-		endTranslate();
+		if (projectile[i].getPointer()[3] < 100)
+		{
+			startModel(projectile[i]);
+			glColor3d(0, 0, 1);
+			glutSolidSphere(proj_radius, 10, 10);
+			endTranslate();
+		}
 	}
 
   
@@ -714,10 +751,25 @@ void drawObjects(void)
 void update(void)
 {
 	if (keystates[GLUT_KEY_LEFT]) {
-		translate(ship, -1, 0, 0);
+		if (firstperson)
+		{
+			translate(ship, 0, 0, -1);
+		}
+		else
+		{
+			if (ship.getPointer()[3] > -50)
+			translate(ship, -1, 0, 0);
+		}
 	}
 	else if (keystates[GLUT_KEY_RIGHT]) {
-		translate(ship, 1, 0, 0);
+		if (firstperson)
+		{
+			translate(ship, 0, 0, 1);
+		}
+		else
+		{
+			translate(ship, 1, 0, 0);
+		}
 	}
 
 	if (keystates[GLUT_KEY_UP]) {
@@ -764,13 +816,26 @@ void update(void)
 	//p_light[2] = light_mvnt * sin(3652/1000.0);
 
 	// fps test
-	/*p_camera[0] = ship.getPointer()[3] - 15;
-	p_camera[1] = ship.getPointer()[7] + 7.5;
-	p_camera[2] = ship.getPointer()[11];
+	if (firstperson)
+	{
+		p_camera[0] = ship.getPointer()[3] - 15;
+		p_camera[1] = ship.getPointer()[7] + 7.5;
+		p_camera[2] = ship.getPointer()[11];
 
-	l_camera[0] = ship.getPointer()[3] + 15;
-	l_camera[1] = ship.getPointer()[7];
-	l_camera[2] = ship.getPointer()[11];*/
+		l_camera[0] = ship.getPointer()[3] + 15;
+		l_camera[1] = ship.getPointer()[7];
+		l_camera[2] = ship.getPointer()[11];
+	}
+	else
+	{
+		p_camera[0] = 0;
+		p_camera[1] = 10;
+		p_camera[2] = 50;
+
+		l_camera[0] = 0;
+		l_camera[1] = 5;
+		l_camera[2] = -10;
+	}
 }
 
 /*~~~~~~~~~~~~~~~~SHADOWS~~~~~~~~~~~~~~*/
@@ -950,6 +1015,10 @@ void Window::keyboardCallback(unsigned char key, int x, int y)
 		} else if (key == 't')
 		{
 			bouncing = !bouncing;
+		}
+		else if (key == 'f')
+		{
+			firstperson = !firstperson;
 		}
 }
 

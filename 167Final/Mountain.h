@@ -15,13 +15,15 @@
 class Mountain {
 public:
     Mountain();
-    Mountain(double startX, double width, double startY);
+    Mountain(double startX, double width, double startY, double z, Vector3 color);
     void generate();
     void draw();
     double endY;
     double endX;
     void translate(double dy);
 private:
+    Vector3 color;
+    double z;
     void genMountain(int start, int end, int depth);
     Vector3 mountains[200];
 };

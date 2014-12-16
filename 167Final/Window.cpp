@@ -44,6 +44,7 @@ bool keystates[256];
 
 const int num_mountains = 10;
 Mountain mountains[num_mountains];
+Mountain closeRange[num_mountains];
 bool genMountains = true;
 bool moving = true;
 bool bouncing = false;
@@ -477,6 +478,8 @@ void startTranslate(float x, float y, float z)
 
 void startModel(Matrix4 m)
 {
+    
+    glMatrixMode(GL_MODELVIEW);
 	Matrix4 modelToWorld = m;
 	modelToWorld.transpose();
 
@@ -709,10 +712,19 @@ void drawObjects(void)
 	endTranslate();
 
 	/* gen/update mountains moved to update */
-	startModel(model);
+    Matrix4 translate;
+    translate.makeTranslate(0, 10, 0);
+	startModel(translate * model);
 	for (int i = 0; i < num_mountains; i++) {
 		mountains[i].draw();
 	}
+    endTranslate();
+    //translate.makeTranslate(0, -20, 0);
+    startModel(model);
+    for (int i = 0; i < num_mountains; i++) {
+        
+        closeRange[i].draw();
+    }
 	endTranslate();
 
 //  glMatrixMode(GL_MODELVIEW);
@@ -805,25 +817,37 @@ void update(void)
     updateAsteroids();
 
 	if (genMountains) {
-		double startY = (rand() % 100 - 50) / ((double)60);
+		double startY = (rand() % 100 - 50) / ((double)10);
+        double startYClose = (rand() % 100 - 50) / ((double)60);
 		for (int i = 0; i < num_mountains; i++) {
-			mountains[i] = Mountain(4 * i - 20, 4, 2 + startY);
+			mountains[i] = Mountain(4 * i - 20, 4, 2 + startY, -10, Vector3(0, 1, 0));
 			mountains[i].generate();
 			startY = mountains[i].endY;
-		}
-		genMountains = false;
+            
+            closeRange[i] = Mountain(4 * i - 20, 4, 2 + startYClose, 0, Vector3(1, 0, 0));
+            closeRange[i].generate();
+            startYClose = closeRange[i].endY;		}
+		    genMountains = false;
 	}
 
 	for (int i = 0; i < num_mountains; i++) {
 		mountains[i].translate(-0.02);
+        closeRange[i].translate(-0.02);
 	}
 	if (mountains[0].endX <= -20) {
 		for (int i = 0; i < num_mountains - 1; i++) {
 			mountains[i] = mountains[i + 1];
 		}
-		mountains[num_mountains - 1] = Mountain(mountains[num_mountains - 2].endX, 4, 2 + mountains[num_mountains - 2].endY);
+		mountains[num_mountains - 1] = Mountain(mountains[num_mountains - 2].endX, 4, 2 + mountains[num_mountains - 2].endY, -10, Vector3(0, 1, 0));
 		mountains[num_mountains - 1].generate();
 	}
+    if (closeRange[0].endX <= -20) {
+        for (int i = 0; i < num_mountains - 1; i++) {
+            closeRange[i] = closeRange[i + 1];
+        }
+        closeRange[num_mountains - 1] = Mountain(closeRange[num_mountains - 2].endX, 4, 2 + closeRange[num_mountains - 2].endY, 0, Vector3(1, 0, 0));
+        closeRange[num_mountains - 1].generate();
+    }
 
 	//p_light[0] = light_mvnt * cos(glutGet(GLUT_ELAPSED_TIME) / 1000.0);
 	//p_light[2] = light_mvnt * sin(glutGet(GLUT_ELAPSED_TIME) / 1000.0);

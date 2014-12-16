@@ -8,11 +8,12 @@
 
 #include <iostream>
 #include "Camera.h"
-#include <sys/time.h>
 #include "Window.h"
 #ifdef __APPLE__
+#include <sys/time.h>
 #include <GLUT/glut.h>
 #else
+#include <time.h>
 #include "GLee.h"
 #include <GL/glut.h>
 #endif
@@ -41,6 +42,7 @@ const int num_mountains = 10;
 Mountain mountains[num_mountains];
 bool genMountains = true;
 bool moving = true;
+bool bouncing = false;
 
 void translate(Matrix4 &m, double tx, double ty, double tz)
 {
@@ -93,16 +95,34 @@ void updateAsteroids() {
 		Vector3 position(asteroids[i].getPointer()[3], asteroids[i].getPointer()[7], asteroids[i].getPointer()[11]);
 		for (int k = 0; k < max_proj; k++) {
 			Vector3 proj(projectile[k].getPointer()[3], projectile[k].getPointer()[7], projectile[k].getPointer()[11]);
-			if ((position - proj).length() < asteroids_radius) {
-				asteroid(i);
+			if ((position - proj).length() < (asteroids_radius + proj_radius)) {
+				if (!bouncing) { asteroid(i); }
+				else { asteroids_vel[i].scale(-1); }
 				projectile[k].makeScale(0, 0, 0);
+			}
+		}
+		
+		for (int k = 0; k < max_proj; k++) {
+			if (i != k) {
+				Vector3 ast(asteroids[k].getPointer()[3], asteroids[k].getPointer()[7], asteroids[k].getPointer()[11]);
+				if ((position - ast).length() < (asteroids_radius * 2)) {
+					if (!bouncing) {
+						asteroid(i);
+						asteroid(k);
+					}
+					else {
+						asteroids_vel[i].scale(-1);
+						asteroids_vel[k].scale(-1);
+					}
+				}
 			}
 		}
 
 		Vector3 jet(ship.getPointer()[3], ship.getPointer()[7], ship.getPointer()[11]);
-		if ((position - jet).length() < asteroids_radius + 2.5) {
-			asteroid(i);
-      ship_respawn = 10;
+		if ((position - jet).length() < (asteroids_radius + 2.5)) {
+			if (!bouncing) { asteroid(i); }
+			else { asteroids_vel[i].scale(-1); }
+			ship_respawn = 10;
 		}
 
 		if (asteroids[i].getPointer()[3] < -75 || asteroids[i].getPointer()[7] < -20)
@@ -126,6 +146,19 @@ void shoot() {
 	}
 }
 
+const int max_particles = 10;
+const float particle_radius = 1;
+Matrix4 particles[max_particles];
+Vector3 particles_pos[max_particles];
+float particles_rad[max_particles];
+float particles_dist[max_particles];
+
+void setupParticles(int i) {
+	particles_pos[i] = Vector3(0, 0, 0);
+	particles_rad[i] = particle_radius;
+	particles_dist[i] = (float)(rand() % 100) / 100;
+}
+
 bool loadOnce = true;
 
 void loadOnceF() {
@@ -136,6 +169,10 @@ void loadOnceF() {
 
 	for (int i = 0; i < max_asteroids; i++) {
 		asteroid(i);
+	}
+
+	for (int i = 0; i < max_particles; i++) {
+		setupParticles(i);
 	}
 
 	loadOnce = false;
@@ -419,9 +456,41 @@ void endTranslate()
 }
 
 long int time_in_ms(){
-  struct timeval tp;
-  gettimeofday(&tp, NULL);
-  return tp.tv_sec * 1000 + tp.tv_usec / 1000;
+	#ifdef __APPLE__
+	  struct timeval tp;
+	  gettimeofday(&tp, NULL);
+	  return tp.tv_sec * 1000 + tp.tv_usec / 1000;
+	#else
+		SYSTEMTIME tp;
+		GetLocalTime(&tp);
+		return tp.wSecond + tp.wMilliseconds;
+	#endif
+}
+
+void updateParticle(int i) {
+	particles_pos[i] = particles_pos[i] + Vector3(-0.1, -0.1 + (double)(rand() % 100) / 1000 * 2, 0);
+
+	particles[i] = ship;
+	particles[i].getPointer()[3] += particles_pos[i].x();
+	particles[i].getPointer()[7] += particles_pos[i].y();
+	particles[i].getPointer()[11] += particles_pos[i].z();
+
+	particles_rad[i] = particle_radius * particles_dist[i];
+	particles_dist[i] -= 0.01;
+	if (particles_dist[i] < 0)
+	{
+		setupParticles(i);
+	}
+}
+
+void drawParticles() {
+	for (int i = 0; i < max_particles; i++) {
+		updateParticle(i);
+		startModel(particles[i]);
+		glColor3d(1, 0, 0);
+		glutSolidSphere(particles_rad[i], 10, 10);
+		endTranslate();
+	}
 }
 
 void draw_ship() {
@@ -440,21 +509,19 @@ void draw_ship() {
             return;
         }
     }
+
+	drawParticles();
     
     startModel(ship);
     glColor3d(1, 0, 0);
     glutSolidCone(1, 5, 10, 10);
   
-  
-  
-  if (bounding_sphere) {
-    glMatrixMode(GL_MODELVIEW);
-    glTranslatef(0, 0, 2.5);
-    glScaled(1.1, 1.1, 1.1);
-    glutWireSphere(2.5, 10, 10);
-  }
-  
-  
+	if (bounding_sphere) {
+		glMatrixMode(GL_MODELVIEW);
+		glTranslatef(0, 0, 2.5);
+		glScaled(1.1, 1.1, 1.1);
+		glutWireSphere(2.5, 10, 10);
+	}
   
     endTranslate();
 }
@@ -829,13 +896,19 @@ void Window::keyboardCallback(unsigned char key, int x, int y)
             model.identity();
 			translate(model, 0, 0, -50);
 			spawnShip();
-        } else if(key == 'g') {
+        } else if(key == 'g')
+		{
             genMountains = true;
-		} else if (key == 32) {
+		} else if (key == 32)
+		{
 			shoot();
-        } else if(key == 'm') {
+        } else if(key == 'm')
+		{
             moving = !moving;
-        }
+		} else if (key == 't')
+		{
+			bouncing = !bouncing;
+		}
 }
 
 void Window::mouseFunc(int button, int state, int x, int y) {

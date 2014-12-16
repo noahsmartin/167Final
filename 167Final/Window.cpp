@@ -51,6 +51,13 @@ void translate(Matrix4 &m, double tx, double ty, double tz)
 	m = temp * m;
 }
 
+void rotate(Matrix4 &m, double r, double tx, double ty, double tz)
+{
+  Matrix4 temp;
+  temp.makeRotate(r, Vector3(tx, ty, tz));
+  m = m * temp;
+}
+
 void spawnShip() {
 	ship.makeRotateY(90);
 	Matrix4 temp;
@@ -90,7 +97,9 @@ void updateAsteroids() {
     }
 	for (int i = 0; i < max_asteroids; i++) {
 		asteroids_vel[i] = asteroids_vel[i] + gravity;
+    rotate(asteroids[i], 1.0, asteroids_vel[i].x(), asteroids_vel[i].y(), asteroids_vel[i].z());
 		translate(asteroids[i], asteroids_vel[i].x(), asteroids_vel[i].y(), 0/*asteroids_vel[i].z()*/);
+    
 
 		Vector3 position(asteroids[i].getPointer()[3], asteroids[i].getPointer()[7], asteroids[i].getPointer()[11]);
 		for (int k = 0; k < max_proj; k++) {

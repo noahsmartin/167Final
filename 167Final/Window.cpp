@@ -132,7 +132,8 @@ void updateAsteroids() {
 			ship_respawn = 10;
 		}
 
-		if (asteroids[i].getPointer()[3] < -75 || asteroids[i].getPointer()[7] < -20)
+		if (asteroids[i].getPointer()[3] < -75 || asteroids[i].getPointer()[7] < -20 ||
+			asteroids[i].getPointer()[3] > 100 || asteroids[i].getPointer()[7] > 75)
 		{
 			asteroid(i);
 		}
@@ -484,7 +485,7 @@ long int time_in_ms(){
 	#else
 		SYSTEMTIME tp;
 		GetLocalTime(&tp);
-		return tp.wSecond + tp.wMilliseconds;
+		return tp.wSecond * 1000 + tp.wMilliseconds;
 	#endif
 }
 
@@ -761,6 +762,15 @@ void update(void)
 
 	//p_light[0] = light_mvnt * cos(3652/1000.0);
 	//p_light[2] = light_mvnt * sin(3652/1000.0);
+
+	// fps test
+	/*p_camera[0] = ship.getPointer()[3] - 15;
+	p_camera[1] = ship.getPointer()[7] + 7.5;
+	p_camera[2] = ship.getPointer()[11];
+
+	l_camera[0] = ship.getPointer()[3] + 15;
+	l_camera[1] = ship.getPointer()[7];
+	l_camera[2] = ship.getPointer()[11];*/
 }
 
 /*~~~~~~~~~~~~~~~~SHADOWS~~~~~~~~~~~~~~*/

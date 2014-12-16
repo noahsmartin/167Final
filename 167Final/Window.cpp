@@ -893,14 +893,11 @@ void Window::keyboardCallback(unsigned char key, int x, int y)
 {
         if(key == 's')
         {
-            Matrix4 m;
-            m.makeScale(0.9, 0.9, 0.9);
-            model = model * m;
+            asteroids_radius -= 5;
+
         } else if(key == 'S')
         {
-            Matrix4 m;
-            m.makeScale(1.1, 1.1, 1.1);
-            model = model * m;
+            asteroids_radius += 5;
         }
         else if (key == 'b'){
           bounding_sphere = !bounding_sphere;

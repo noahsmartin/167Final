@@ -92,9 +92,21 @@ Vector3 gravity(0, -0.002, 0);
 #define CACHE_SIZE 240
 
 void asteroid(int i) {
-	asteroids[i].makeTranslate(75 + (rand() % 10), (rand() % 60 + 10), -30 + (rand() % 30));
+	float x = 75 + (rand() % 10);
+	float y = (rand() % 60 + 10);
+	float z = -10;
+	if (rand() % 10 > 8) {
+		x = 175;
+		y = 100;
+		z = -120 + (rand() % 30);
+	}
+	else if (rand() % 10 > 6) {
+		z = -30 + (rand() % 30);
+	}
+	asteroids[i].makeTranslate(x, y, z);
 	asteroids_vel[i].scale(0);
 	asteroids_vel[i].setx(-(double)(rand() % 50 + 25) / 100);
+	asteroids_vel[i].setz(-0.01 + (double)(rand() % 200) / 10000);
 }
 
 void updateAsteroids() {
@@ -103,7 +115,7 @@ void updateAsteroids() {
 		for (int i = 0; i < max_asteroids; i++) {
 			asteroids_vel[i] = asteroids_vel[i] + gravity;
 			rotate(asteroids[i], 1.0, asteroids_vel[i].x(), asteroids_vel[i].y(), asteroids_vel[i].z());
-			translate(asteroids[i], asteroids_vel[i].x(), asteroids_vel[i].y(), 0/*asteroids_vel[i].z()*/);
+			translate(asteroids[i], asteroids_vel[i].x(), asteroids_vel[i].y(), asteroids_vel[i].z());
 		}
 	}
 	for (int i = 0; i < max_asteroids; i++) {
@@ -154,7 +166,7 @@ void updateAsteroids() {
 		}
 
 		if (asteroids[i].getPointer()[3] < -75 || asteroids[i].getPointer()[7] < -20 ||
-			asteroids[i].getPointer()[3] > 100 || asteroids[i].getPointer()[7] > 75)
+			asteroids[i].getPointer()[3] > 200 || asteroids[i].getPointer()[7] > 200)
 		{
 			asteroid(i);
 		}
@@ -250,7 +262,7 @@ void Window::reshapeCallback(int w, int h)
 /*~~~~~~~~~~~~~~~~SHADOWS~~~~~~~~~~~~~~*/
 
 // Expressed as float so gluPerspective division returns a float and not 0 (640/480 != 640.0/480.0).
-#define SHADOW_MAP_RATIO 6
+#define SHADOW_MAP_RATIO 4
 
 
 //Camera position
@@ -964,11 +976,11 @@ void Window::displayCallback()
     
     // specify texture coordinates for each vertex
     // note that textures are stored "upside down"
-	double sc = 3;
-	glTexCoord2f(0, 1); glVertex3f(-50 * sc, 0, -31 * sc);
-	glTexCoord2f(1, 1); glVertex3f(50 * sc, 0, -31 * sc);
-	glTexCoord2f(1, 0); glVertex3f(50 * sc, 38 * sc, -31 * sc);
-	glTexCoord2f(0, 0); glVertex3f(-50 * sc, 38 * sc, -31 * sc);
+	double sc = 8;
+	glTexCoord2f(0, 1); glVertex3f(-50 * sc, -38 * (8 - (sc - 3)), -300);
+	glTexCoord2f(1, 1); glVertex3f(50 * sc, -38 * (8 - (sc - 3)), -300);
+	glTexCoord2f(1, 0); glVertex3f(50 * sc, 38 * (sc - 3), -300);
+	glTexCoord2f(0, 0); glVertex3f(-50 * sc, 38 * (sc - 3), -300);
     
     glEnd();
     

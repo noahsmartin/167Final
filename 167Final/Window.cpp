@@ -73,7 +73,7 @@ void spawnShip() {
 const int max_proj = 20;
 float proj_radius = 0.5;
 Matrix4 projectile[max_proj];
-double projectile_speeds[max_proj];
+Vector3 projectile_speeds[max_proj];
 int proj_index = 0;
 
 const int max_asteroids = 10;
@@ -144,23 +144,22 @@ void shoot() {
 	projectile[proj_index].getPointer()[3] = ship.getPointer()[3];
 	projectile[proj_index].getPointer()[7] = ship.getPointer()[7];
 	projectile[proj_index].getPointer()[11] = ship.getPointer()[11];
-    projectile_speeds[proj_index] = 1.2;
+    projectile_speeds[proj_index] = Vector3(1.2, 0, 0);
     if (keystates[GLUT_KEY_LEFT]) {
         // This isn't really right, we just don't want the bullet to
         // move really slow, so pretent it is fired with more initial
         // velocity when the ship is moving backwards.
-        projectile_speeds[proj_index] -= 0.5;
+        projectile_speeds[proj_index] = projectile_speeds[proj_index] - Vector3(0.5, 0, 0);
     }
     else if (keystates[GLUT_KEY_RIGHT]) {
-        projectile_speeds[proj_index] += 1;
+        projectile_speeds[proj_index] = projectile_speeds[proj_index] + Vector3(1, 0, 0);
     }
     
     if (keystates[GLUT_KEY_UP]) {
-        // TODO: set veritical velocity and add gravity to missiles
-       // translate(ship, 0, 1, 0);
+        projectile_speeds[proj_index] = projectile_speeds[proj_index] + Vector3(0, 0.2, 0);
     }
     else if (keystates[GLUT_KEY_DOWN]) {
-       // translate(ship, 0, -1, 0);
+        projectile_speeds[proj_index] = projectile_speeds[proj_index] - Vector3(0, 0.2, 0);
     }
 	translate(projectile[proj_index++], 2, 0, 0);
 
@@ -732,7 +731,8 @@ void update(void)
 
 	for (int i = 0; i < max_proj; i++)
 	{
-		translate(projectile[i], projectile_speeds[i], 0, 0);
+		translate(projectile[i], projectile_speeds[i].x(), projectile_speeds[i].y(), 0);
+        projectile_speeds[i] = projectile_speeds[i] + gravity;
 	}
     updateAsteroids();
 

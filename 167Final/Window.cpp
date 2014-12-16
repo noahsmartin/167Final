@@ -479,6 +479,11 @@ long int time_in_ms(){
 }
 
 void updateParticle(int i) {
+	if (particles_dist[i] < 0)
+	{
+		setupParticles(i);
+	}
+
 	particles_pos[i] = particles_pos[i] + Vector3(-0.1, -0.1 + (double)(rand() % 100) / 1000 * 2, 0);
 
 	particles[i] = ship;
@@ -488,10 +493,6 @@ void updateParticle(int i) {
 
 	particles_rad[i] = particle_radius * particles_dist[i];
 	particles_dist[i] -= 0.01;
-	if (particles_dist[i] < 0)
-	{
-		setupParticles(i);
-	}
 }
 
 void drawParticles() {

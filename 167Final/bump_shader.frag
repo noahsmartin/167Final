@@ -61,8 +61,63 @@ varying vec4 position;
 varying vec3 vVertex;
 varying vec3 normal_t;
 
+// shadow stuff
+uniform sampler2D ShadowMap;
+varying vec4 ShadowCoord;
+
+varying vec4 diffuse,ambientGlobal, ambient;
+varying vec3 normal,halfVector1;
+
 void main()
 {
+    vec3 n,viewV, halfV, lightDir;
+    float NdotL,NdotHV;
+    vec4 color = gl_Color;
+    float att, dist;
+    
+    n = normalize(normal_t);
+    
+    // Compute the ligt direction
+    lightDir = vec3(gl_LightSource[0].position-position);
+    
+    dist = length(lightDir);
+ 
+    
+    NdotL = max(dot(n,normalize(lightDir)),0.0);
+ 
+    if (NdotL > 0.0) {
+     
+        att = 1.0 / (gl_LightSource[0].constantAttenuation +
+                gl_LightSource[0].linearAttenuation * dist +
+                gl_LightSource[0].quadraticAttenuation * dist * dist);
+        color += att * (diffuse * NdotL + ambient);
+     
+         
+        halfV = normalize(halfVector1);
+        NdotHV = max(dot(n,halfV),0.0);
+        color += att * gl_FrontMaterial.specular * gl_LightSource[0].specular * pow(NdotHV,gl_FrontMaterial.shininess);
+    }
+ 
+    //gl_FragColor = color;
+
+    vec4 shadowCoordinateWdivide = ShadowCoord / ShadowCoord.w ;
+    
+    // Used to lower moiré pattern and self-shadowing
+    shadowCoordinateWdivide.z += 0.0005 - 0.000555 ;
+    
+    float distanceFromLight = texture2D(ShadowMap,shadowCoordinateWdivide.st).z;
+    
+    
+    float shadow = 1.0;
+    if (ShadowCoord.w > 0.0)
+        shadow = distanceFromLight < shadowCoordinateWdivide.z ? 0.25 : 1.0 ;
+    
+    color = vec4(1.0, 0, 0, 0);
+    gl_FragColor = color;
+    gl_FragColor *= shadow;
+
+
+    // bump mapping 
     vec3 coord = normalize(TexCoord0);
     float radius = 1;
     float x = coord.x;
@@ -85,12 +140,15 @@ void main()
     // compute ambient
     
     
-    gl_FragColor =	diffuseMaterial * lamberFactor ;
-    gl_FragColor += vec4(0.05, 0.05, 0.05, 0);
-/*
+    gl_FragColor =	diffuseMaterial * lamberFactor;
+    gl_FragColor += vec4(0.05, 0.05, 0.05, 0); 
+
+    //gl_FragColor = vec4(1.0, 0, 0, 0);
+    gl_FragColor *= shadow;
+
     // toon shading - https://github.com/mchamberlain/Cel-Shader/tree/master/shaders
 
-
+/*
     vec4 light_pos, light_dir, eye_dir, reflect_dir;
     light_pos = gl_LightSource[0].position;
     light_dir = -vec4(vec3(gl_LightSource[0].position-position), 0);
@@ -130,7 +188,7 @@ void main()
     gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
   }
   else {
-    gl_FragColor = diffuseMaterial * lamberFactor * intensity;
+    gl_FragColor = diffuseMaterial * lamberFactor * intensity * shadow;
   }*/
     
 }

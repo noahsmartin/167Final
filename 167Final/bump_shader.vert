@@ -29,6 +29,13 @@ varying vec4 position;
 varying vec3 vVertex;
 varying vec3 normal_t;
 
+
+// shadow stuff
+varying vec4 ShadowCoord;
+
+varying vec4 diffuse,ambientGlobal,ambient;
+varying vec3 halfVector1;
+
 void main()
 {
     normal_t = normalize(gl_NormalMatrix * gl_Normal);
@@ -82,4 +89,20 @@ void main()
 
     position = gl_ModelViewMatrix * gl_Vertex;
     vVertex = gl_Vertex.xyz;
+
+
+    // shadow stuff
+    halfVector1 = gl_LightSource[0].halfVector.xyz;
+     
+    /* Compute the diffuse, ambient and globalAmbient terms */
+    diffuse = gl_FrontMaterial.diffuse * gl_LightSource[0].diffuse;
+    ambient = gl_FrontMaterial.ambient * gl_LightSource[0].ambient;
+    ambientGlobal = gl_LightModel.ambient * gl_FrontMaterial.ambient;
+
+    ShadowCoord = gl_TextureMatrix[7] * gl_Vertex;
+  
+    gl_Position = ftransform();
+
+    // toon shading 
+    gl_FrontColor = gl_Color;
 }

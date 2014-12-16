@@ -119,6 +119,7 @@ int main(int argc, char *argv[])
 	glLightfv(GL_LIGHT0, GL_POSITION, position);
     
     Globals::shader = new Shader(BUMP_VERT_SHADER, BUMP_FRAG_SHADER);
+  
     
     // Install callback functions:
     glutDisplayFunc(Window::displayCallback);

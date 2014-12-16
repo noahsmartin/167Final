@@ -148,7 +148,7 @@ void Window::idleCallback()
     }
     displayCallback();         // call display routine to show the cube
   
-//    Globals::shader = new Shader(BUMP_VERT_SHADER, BUMP_FRAG_SHADER);
+  //Globals::shader = new Shader(BUMP_VERT_SHADER, BUMP_FRAG_SHADER);
 }
 
 void Window::reshapeCallback(int w, int h)
@@ -170,7 +170,7 @@ void Window::reshapeCallback(int w, int h)
 /*~~~~~~~~~~~~~~~~SHADOWS~~~~~~~~~~~~~~*/
 
 // Expressed as float so gluPerspective division returns a float and not 0 (640/480 != 640.0/480.0).
-#define SHADOW_MAP_RATIO 4
+#define SHADOW_MAP_RATIO 6
 
 
 //Camera position
@@ -503,27 +503,6 @@ void mySphere2()
         glBegin(GL_QUAD_STRIP);
         for (i = 0; i <= slices; i++) {
             // Compute coordinates
-            x = costheta[i] * costemp2;
-            y = sintheta[i] * costemp2;
-            z = sintemp2;
-            s = 1 - (float) i / slices;
-            t = 1 - (float) (j+1) / stacks;
-            tangent[0] = -costheta[i]*sintemp2;
-            tangent[1] = -sintheta[i]*sintemp2;
-            tangent[2] = costemp2;
-            // Set vectors
-            glNormal3f(x,y,z);
-            //  glMultiTexCoord2f(GL_TEXTURE0,s,t);
-            // if(use_bump)
-            // {
-            glMultiTexCoord2f(GL_TEXTURE1,s,t);
-            // TODO: Set tangent vector in shader
-            glVertexAttrib3fv(ints[1], tangent);
-            
-            //}
-            glVertex3f(x,y,z);
-            
-            // Compute coordinates
             x = costheta[i] * costemp1;
             y = sintheta[i] * costemp1;
             z = sintemp1;
@@ -543,6 +522,29 @@ void mySphere2()
             
             //   }
             glVertex3f(x,y,z);
+          
+          
+            // Compute coordinates
+            x = costheta[i] * costemp2;
+            y = sintheta[i] * costemp2;
+            z = sintemp2;
+            s = 1 - (float) i / slices;
+            t = 1 - (float) (j+1) / stacks;
+            tangent[0] = -costheta[i]*sintemp2;
+            tangent[1] = -sintheta[i]*sintemp2;
+            tangent[2] = costemp2;
+            // Set vectors
+            glNormal3f(x,y,z);
+            //  glMultiTexCoord2f(GL_TEXTURE0,s,t);
+            // if(use_bump)
+            // {
+            glMultiTexCoord2f(GL_TEXTURE1,s,t);
+            // TODO: Set tangent vector in shader
+            glVertexAttrib3fv(ints[1], tangent);
+            
+            //}
+            glVertex3f(x,y,z);
+          
         }
         glEnd();
     }
@@ -591,6 +593,10 @@ void drawObjects(void)
 	}
 
     Globals::shader->bind();
+  glActiveTexture(GL_TEXTURE7);
+  int shadow_locaiton = glGetUniformLocationARB(Globals::shader->getPid(), "ShadowMap");
+  glUniform1i(shadow_locaiton, 7);
+  
     glActiveTexture(GL_TEXTURE1);
     glEnable(GL_TEXTURE_2D);
     int normal_location = glGetUniformLocationARB(Globals::shader->pid, "normal_texture");
@@ -683,7 +689,7 @@ void Window::displayCallback()
     glutSwapBuffers();*/
 
   
-  loadShadowShader();
+//  loadShadowShader();
   
 	update();
 
@@ -726,6 +732,7 @@ void Window::displayCallback()
 	//Using the shadow shader
 	glUseProgramObjectARB(shadowShaderId);
 	glUniform1iARB(shadowMapUniform, 7);
+  
 	glActiveTextureARB(GL_TEXTURE7);
     glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, Globals::textures[1]);

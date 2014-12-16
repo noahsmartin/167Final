@@ -113,7 +113,7 @@ void updateAsteroids() {
 			}
 		}
 		
-		for (int k = 0; k < max_proj; k++) {
+		for (int k = 0; k < max_asteroids; k++) {
 			if (i != k) {
 				Vector3 ast(asteroids[k].getPointer()[3], asteroids[k].getPointer()[7], asteroids[k].getPointer()[11]);
 				if ((position - ast).length() < (asteroids_radius * 2)) {

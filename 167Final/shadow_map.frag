@@ -109,5 +109,5 @@ void main()
   }
 
 // uncomment the next line to disable toon shading
- //gl_FragColor = shadow * color * intensity;
+ //gl_FragColor = shadow * color ;
 }

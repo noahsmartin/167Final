@@ -29,6 +29,8 @@ int Window::height = 512;   // set window height in pixels here
 
 Camera camera(Vector3(0, 0, 10), Vector3(0, 0, -1), Vector3(0, 1, 0));
 
+bool shader_enabled = true;
+
 Matrix4 model;
 Matrix4 ship;
 
@@ -592,7 +594,10 @@ void drawObjects(void)
 		endTranslate();
 	}
 
+  
+  if (shader_enabled) {
     Globals::shader->bind();
+  }
   glActiveTexture(GL_TEXTURE7);
   int shadow_locaiton = glGetUniformLocationARB(Globals::shader->getPid(), "ShadowMap");
   glUniform1i(shadow_locaiton, 7);
@@ -611,7 +616,9 @@ void drawObjects(void)
 		mySphere2();
 		endTranslate();
 	}
+  if (shader_enabled) {
     Globals::shader->unbind();
+  }
   
 //    glMatrixMode(GL_TEXTURE);
   
@@ -730,8 +737,11 @@ void Window::displayCallback()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	//Using the shadow shader
-	glUseProgramObjectARB(shadowShaderId);
-	glUniform1iARB(shadowMapUniform, 7);
+  
+  if (shader_enabled) {
+    glUseProgramObjectARB(shadowShaderId);
+    glUniform1iARB(shadowMapUniform, 7);
+  }
   
 	glActiveTextureARB(GL_TEXTURE7);
     glEnable(GL_TEXTURE_2D);
@@ -812,6 +822,9 @@ void Window::keyboardCallback(unsigned char key, int x, int y)
         }
         else if (key == 'b'){
           bounding_sphere = !bounding_sphere;
+        }
+        else if (key == 'e'){
+          shader_enabled = !shader_enabled;
         }
         if(key == 'x')
         {

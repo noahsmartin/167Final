@@ -23,9 +23,9 @@ Shader::Shader(const char *vert, const char *frag, bool isFile)
 	{
 		char* vv = read(vert);
 		char* vf = read(frag);
-        printf("setting up");
+//        printf("setting up");
 		setup(vv, vf);
-        printf("setup done");
+//        printf("setup done");
 		delete[] vv;
 		delete[] vf;
 	}

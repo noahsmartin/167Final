@@ -46,14 +46,14 @@ void main()
 	vec4 shadowCoordinateWdivide = ShadowCoord / ShadowCoord.w ;
 	
 	// Used to lower moiré pattern and self-shadowing
-	shadowCoordinateWdivide.z += 0.0005;
+	shadowCoordinateWdivide.z += 0.0005 - 0.000555 ;
 	
 	float distanceFromLight = texture2D(ShadowMap,shadowCoordinateWdivide.st).z;
 	
 	
  	float shadow = 1.0;
  	if (ShadowCoord.w > 0.0)
- 		shadow = distanceFromLight < shadowCoordinateWdivide.z - 0.000555 ? 0.25 : 1.0 ;
+ 		shadow = distanceFromLight < shadowCoordinateWdivide.z ? 0.25 : 1.0 ;
   	
   	gl_FragColor = shadow * color;
 
@@ -109,5 +109,5 @@ void main()
   }
 
 // uncomment the next line to disable toon shading
-// gl_FragColor = shadow * color;
+ //gl_FragColor = shadow * color ;
 }

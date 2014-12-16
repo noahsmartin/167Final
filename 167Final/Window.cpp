@@ -117,22 +117,15 @@ void updateAsteroids() {
 			if (i != k) {
 				Vector3 ast(asteroids[k].getPointer()[3], asteroids[k].getPointer()[7], asteroids[k].getPointer()[11]);
 				if ((position - ast).length() < (asteroids_radius * 2)) {
-					if (!bouncing) {
-						asteroid(i);
-						asteroid(k);
-					}
-					else {
-						asteroids_vel[i].scale(-1);
-						asteroids_vel[k].scale(-1);
-					}
+					asteroids_vel[i].scale(-1);
+					asteroids_vel[k].scale(-1);
 				}
 			}
 		}
 
 		Vector3 jet(ship.getPointer()[3], ship.getPointer()[7], ship.getPointer()[11]);
 		if ((position - jet).length() < (asteroids_radius + 2.5)) {
-			if (!bouncing) { asteroid(i); }
-			else { asteroids_vel[i].scale(-1); }
+			asteroid(i);
 			ship_respawn = 10;
 		}
 

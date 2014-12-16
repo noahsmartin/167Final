@@ -67,7 +67,7 @@ void Mountain::draw() {
     glBegin(GL_QUADS);
     //glMatrixMode(GL_MODELVIEW);
     for (int i = 0; i < 199; i++) {
-        glScalef(10, 10, 10);
+        //glScalef(10, 10, 10);
         glNormal3f(0, 0, 1);
         glColor3f(color.x(), color.y(), color.z());
         Vector3 start = mountains[i];

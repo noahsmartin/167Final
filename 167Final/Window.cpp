@@ -724,7 +724,7 @@ void drawObjects(void)
 	endTranslate();
 
 	/* gen/update mountains moved to update */
-    Matrix4 translate;
+    /*Matrix4 translate;
     translate.makeTranslate(0, 10, 0);
 	startModel(translate * model);
 	for (int i = 0; i < num_mountains; i++) {
@@ -738,7 +738,7 @@ void drawObjects(void)
         closeRange[i].draw();
     }
 	endTranslate();
-
+	*/
 //  glMatrixMode(GL_MODELVIEW);
   
 //	glUseProgramObjectARB(0);
@@ -832,32 +832,32 @@ void update(void)
 		double startY = (rand() % 100 - 50) / ((double)10);
         double startYClose = (rand() % 100 - 50) / ((double)60);
 		for (int i = 0; i < num_mountains; i++) {
-			mountains[i] = Mountain(4 * i - 20, 4, 2 + startY, -10, Vector3(0, 1, 0));
+			mountains[i] = Mountain(4 * i - 20, 4, 2 + startY, -10, Vector3(0, 0, 0));
 			mountains[i].generate();
 			startY = mountains[i].endY;
             
-            closeRange[i] = Mountain(4 * i - 20, 4, 2 + startYClose, 0, Vector3(1, 0, 0));
+            closeRange[i] = Mountain(4 * i - 20, 4, 2 + startYClose, 0, Vector3(0.2, 0.2, 0.2));
             closeRange[i].generate();
             startYClose = closeRange[i].endY;		}
 		    genMountains = false;
 	}
 
 	for (int i = 0; i < num_mountains; i++) {
-		mountains[i].translate(-0.02);
+		mountains[i].translate(-0.01);
         closeRange[i].translate(-0.02);
 	}
 	if (mountains[0].endX <= -20) {
 		for (int i = 0; i < num_mountains - 1; i++) {
 			mountains[i] = mountains[i + 1];
 		}
-		mountains[num_mountains - 1] = Mountain(mountains[num_mountains - 2].endX, 4, 2 + mountains[num_mountains - 2].endY, -10, Vector3(0, 1, 0));
+		mountains[num_mountains - 1] = Mountain(mountains[num_mountains - 2].endX, 4, 2 + mountains[num_mountains - 2].endY, -10, Vector3(0, 0, 0));
 		mountains[num_mountains - 1].generate();
 	}
     if (closeRange[0].endX <= -20) {
         for (int i = 0; i < num_mountains - 1; i++) {
             closeRange[i] = closeRange[i + 1];
         }
-        closeRange[num_mountains - 1] = Mountain(closeRange[num_mountains - 2].endX, 4, 2 + closeRange[num_mountains - 2].endY, 0, Vector3(1, 0, 0));
+        closeRange[num_mountains - 1] = Mountain(closeRange[num_mountains - 2].endX, 4, 2 + closeRange[num_mountains - 2].endY, 0, Vector3(0.2, 0.2, 0.2));
         closeRange[num_mountains - 1].generate();
     }
 
@@ -984,6 +984,23 @@ void Window::displayCallback()
     
     glEnd();
     
+	/* gen/update mountains moved to update */
+	Matrix4 translate;
+	translate.makeTranslate(0, 5, 0);
+	startModel(translate * model);
+	for (int i = 0; i < num_mountains; i++) {
+		mountains[i].draw();
+	}
+	endTranslate();
+	//translate.makeTranslate(0, -20, 0);
+	translate.makeTranslate(0, -10, 0);
+	startModel(translate * model);
+	for (int i = 0; i < num_mountains; i++) {
+
+		closeRange[i].draw();
+	}
+	endTranslate();
+
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, 0);
     glDisable(GL_TEXTURE_2D);

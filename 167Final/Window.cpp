@@ -31,6 +31,9 @@ int Window::height = 512;   // set window height in pixels here
 Camera camera(Vector3(0, 0, 10), Vector3(0, 0, -1), Vector3(0, 1, 0));
 
 bool shader_enabled = true;
+bool enemyDead = true;
+bool box_1 = true;
+bool box_2 = true;
 
 Matrix4 model;
 Matrix4 ship;
@@ -39,6 +42,7 @@ Matrix4 enemy;
 bool bounding_sphere = false;
 
 int ship_respawn = 0;
+int enemy_respawn = 0;
 GLint *ints = new GLint[2];
 
 bool keystates[256];
@@ -74,6 +78,8 @@ void spawnShip() {
 }
 
 void spawnEnemy() {
+	enemyDead = false;
+	enemy_respawn = 0;
 	enemy.makeRotateY(-90);
 	Matrix4 temp;
 	temp.makeScale(1, 1.0, 1);
@@ -131,8 +137,7 @@ void asteroid(int i) {
 	asteroids_vel[i].setz(-0.01 + (double)(rand() % 200) / 10000);
 }
 
-void updateAsteroids() {
-    
+void updateAsteroids() {    
     for (int i = 0; i < max_asteroids; i++) {
         if(moving) {
             asteroids_vel[i] = asteroids_vel[i] + gravity;
@@ -148,10 +153,20 @@ void updateAsteroids() {
 			Vector3 proj(projectile[k].getPointer()[3], projectile[k].getPointer()[7], projectile[k].getPointer()[11]);
 			if ((position - proj).length() < (asteroids_radius + proj_radius) && projectile_speeds[k].x() != 0) {
 				if (!bouncing) { asteroid(i); }
-                else { asteroids_vel[i] = projectile_speeds[k]; }
+				else { asteroids_vel[i] = projectile_speeds[k]; }
 				projectile_speeds[k].scale(0);
 				projectile[k].makeScale(0, 0, 0);
-                score += 50;
+				score += 50;
+			}
+		}
+
+		for (int k = 0; k < enemy_max_proj; k++) {
+			Vector3 proj(enemy_projectile[k].getPointer()[3], enemy_projectile[k].getPointer()[7], enemy_projectile[k].getPointer()[11]);
+			if ((position - proj).length() < (asteroids_radius + proj_radius) && enemy_projectile_speeds[k].x() != 0) {
+				if (!bouncing) { asteroid(i); }
+				else { asteroids_vel[i] = enemy_projectile_speeds[k]; }
+				enemy_projectile_speeds[k].scale(0);
+				enemy_projectile[k].makeScale(0, 0, 0);
 			}
 		}
 		
@@ -187,7 +202,12 @@ void updateAsteroids() {
 		if ((position - jet).length() < (asteroids_radius + 2.5)) {
 			asteroid(i);
 			ship_respawn = 10;
-            score -= 100;
+			score -= 100;
+		}
+		jet = Vector3 (enemy.getPointer()[3], enemy.getPointer()[7], enemy.getPointer()[11]);
+		if ((position - jet).length() < (asteroids_radius + 3.5)) {
+			asteroid(i);
+			//enemy_respawn = 10;
 		}
 
 		if (asteroids[i].getPointer()[3] < -75 || asteroids[i].getPointer()[7] < -20 ||
@@ -283,6 +303,7 @@ void loadOnceF() {
     costheta[NUM_DIVS] = costheta[0];
 
 	spawnShip();
+	enemyDead = true;
 
 	for (int i = 0; i < max_asteroids; i++) {
 		asteroid(i);
@@ -692,11 +713,33 @@ void draw_ship() {
 }
 
 void draw_enemy() {
-	//drawParticles();
+	if (enemy_respawn > 0) {
+		enemyDead = true;
+		static bool on_off = false;
+		static long int last_time = 0;
+
+		if (time_in_ms() - last_time > 250) {
+			on_off = !on_off;
+			last_time = time_in_ms();
+			enemy_respawn--;
+		}
+
+		if (on_off) {
+			return;
+		}
+	}
+
+	translate(enemy, 0, -0.5 + (double)(rand() % 10) / 10, -0.5 + (double)(rand() % 10) / 10);
 
 	startModel(enemy);
 	glColor3d(1, 0, 1);
+
+	//glEnable(GL_TEXTURE_GEN_S); //enable texture coordinate generation
+	//glEnable(GL_TEXTURE_GEN_T);
+	//glBindTexture(GL_TEXTURE_2D, Globals::textures[0]);
 	glutSolidCube(4);
+	//glDisable(GL_TEXTURE_GEN_S); //enable texture coordinate generation
+	//glDisable(GL_TEXTURE_GEN_T);
 
 	if (bounding_sphere) {
 		glMatrixMode(GL_MODELVIEW);
@@ -772,13 +815,19 @@ void drawObjects(void)
 	glColor4f(0.9f, 0.9f, 0.9f, 1);
 
 	// Instead of calling glTranslatef, we need a custom function that also maintain the light matrix
-	startTranslate(0, 4, -16);
-  glutSolidCube(4);
-	endTranslate();
+	if (box_1)
+	{
+		startTranslate(0, 4, -16);
+		glutSolidCube(4);
+		endTranslate();
+	}
 
-	startTranslate(-6, 4, -5);
-	glutSolidCube(4);
-	endTranslate();
+	if (box_2)
+	{
+		startTranslate(-6, 4, -5);
+		glutSolidCube(4);
+		endTranslate();
+	}
 
 	/* gen/update mountains moved to update */
     /*Matrix4 translate;
@@ -811,11 +860,13 @@ void drawObjects(void)
 	  }
   }
 
-  spawnEnemy();
-  draw_enemy();
-  if (rand() % 100 > 90)
-  {
-	  enemyShoot(enemy);
+
+  if (!enemyDead){
+	draw_enemy();
+	  if (rand() % 100 > 95)
+	  {
+		  enemyShoot(enemy);
+	  }
   }
 
   for (int i = 0; i < enemy_max_proj; i++) {
@@ -906,6 +957,49 @@ void update(void)
 		enemy_projectile_speeds[i] = enemy_projectile_speeds[i] + gravity;
 	}
     updateAsteroids();
+
+	Vector3 position(enemy.getPointer()[3], enemy.getPointer()[7], enemy.getPointer()[11]);
+	for (int k = 0; k < max_proj; k++) {
+		Vector3 proj(projectile[k].getPointer()[3], projectile[k].getPointer()[7], projectile[k].getPointer()[11]);
+
+		Vector3 box(0, 4, -16);
+		if ((proj - box).length() < (3.5 + proj_radius) && projectile_speeds[k].x() != 0) {
+			box_1 = false;
+			spawnEnemy();
+
+			projectile_speeds[k].scale(0);
+			projectile[k].makeScale(0, 0, 0);
+		}
+		Vector3 box2(-6, 4, -5);
+		if ((proj - box2).length() < (3.5 + proj_radius) && projectile_speeds[k].x() != 0) {
+			box_2 = false;
+			spawnEnemy();
+
+			projectile_speeds[k].scale(0);
+			projectile[k].makeScale(0, 0, 0);
+		}
+
+		if ((position - proj).length() < (3.5 + proj_radius) && projectile_speeds[k].x() != 0) {
+			enemy_respawn = 10;
+			if (!enemyDead)
+				score += 100;
+
+			projectile_speeds[k].scale(0);
+			projectile[k].makeScale(0, 0, 0);
+		}
+	}
+
+	position = Vector3(ship.getPointer()[3], ship.getPointer()[7], ship.getPointer()[11]);
+	for (int k = 0; k < enemy_max_proj; k++) {
+		Vector3 proj(enemy_projectile[k].getPointer()[3], enemy_projectile[k].getPointer()[7], enemy_projectile[k].getPointer()[11]);
+		if ((position - proj).length() < (2.5 + proj_radius) && enemy_projectile_speeds[k].x() != 0) {
+			ship_respawn = 10;
+			score -= 100;
+
+			enemy_projectile_speeds[k].scale(0);
+			enemy_projectile[k].makeScale(0, 0, 0);
+		}
+	}
 
 	if (genMountains) {
 		double startY = (rand() % 100 - 50) / ((double)10);

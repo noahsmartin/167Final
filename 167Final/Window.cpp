@@ -303,7 +303,7 @@ void Window::reshapeCallback(int w, int h)
 /*~~~~~~~~~~~~~~~~SHADOWS~~~~~~~~~~~~~~*/
 
 // Expressed as float so gluPerspective division returns a float and not 0 (640/480 != 640.0/480.0).
-#define SHADOW_MAP_RATIO 4
+#define SHADOW_MAP_RATIO 6
 
 
 //Camera position

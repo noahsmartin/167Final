@@ -1018,12 +1018,6 @@ void Window::displayCallback()
 		closeRange[i].draw();
 	}
 	endTranslate();
-    
-    char buffer[20];
-    sprintf(buffer, "Score: %d", score);
-    output(-40, 30, 0, 1.0, 0.0, GLUT_BITMAP_HELVETICA_18, buffer);
-    sprintf(buffer, "FPS: %d", fps);
-    output(35, 30, 0, 1.0, 0.0, GLUT_BITMAP_HELVETICA_18, buffer);
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, 0);
@@ -1032,6 +1026,15 @@ void Window::displayCallback()
     glActiveTexture(GL_TEXTURE7);
     glBindTexture(GL_TEXTURE_2D, 0);
     glDisable(GL_TEXTURE_2D);
+    
+    glPushMatrix();
+    setupMatrices(0, 10, 50, 0, 5, -10);
+    char buffer[20];
+    sprintf(buffer, "Score: %d", score);
+    output(-40, 30, 0, 1.0, 0.0, GLUT_BITMAP_HELVETICA_18, buffer);
+    sprintf(buffer, "FPS: %d", fps);
+    output(35, 30, 0, 1.0, 0.0, GLUT_BITMAP_HELVETICA_18, buffer);
+    glPopMatrix();
 
 	// DEBUG only. this piece of code draw the depth buffer onscreen
 	/*

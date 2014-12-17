@@ -118,13 +118,15 @@ void asteroid(int i) {
 
 void updateAsteroids() {
     
-    if(moving) {
-		for (int i = 0; i < max_asteroids; i++) {
-			asteroids_vel[i] = asteroids_vel[i] + gravity;
-			rotate(asteroids[i], 1.0, asteroids_vel[i].x(), asteroids_vel[i].y(), asteroids_vel[i].z());
-			translate(asteroids[i], asteroids_vel[i].x(), asteroids_vel[i].y(), asteroids_vel[i].z());
-		}
-	}
+    for (int i = 0; i < max_asteroids; i++) {
+        if(moving) {
+            asteroids_vel[i] = asteroids_vel[i] + gravity;
+        }
+        rotate(asteroids[i], 1.0, asteroids_vel[i].x(), asteroids_vel[i].y(), asteroids_vel[i].z());
+        if(moving) {
+            translate(asteroids[i], asteroids_vel[i].x(), asteroids_vel[i].y(), asteroids_vel[i].z());
+        }
+    }
 	for (int i = 0; i < max_asteroids; i++) {
 		Vector3 position(asteroids[i].getPointer()[3], asteroids[i].getPointer()[7], asteroids[i].getPointer()[11]);
 		for (int k = 0; k < max_proj; k++) {

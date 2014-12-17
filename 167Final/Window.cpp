@@ -1071,7 +1071,9 @@ void Window::keyboardCallback(unsigned char key, int x, int y)
 {
         if(key == 's')
         {
-           asteroids_radius -= 5;
+            if(asteroids_radius >= 5) {
+                asteroids_radius -= 5;
+            }
 
         } else if(key == 'S')
         {

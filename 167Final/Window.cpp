@@ -93,6 +93,11 @@ int score = 0;
 #define NUM_DIVS 50
 #define CACHE_SIZE 240
 
+GLfloat sintheta[NUM_DIVS+1];
+GLfloat costheta[NUM_DIVS+1];
+GLfloat sinphi[NUM_DIVS+1];
+GLfloat cosphi[NUM_DIVS+1];
+
 void asteroid(int i) {
 	float x = 75 + (rand() % 10);
 	float y = (rand() % 60 + 10);
@@ -225,6 +230,23 @@ bool loadOnce = true;
 void loadOnceF() {
 	model.identity();
 	translate(model, 0, 0, -50);
+    
+    for (int i = 0; i < NUM_DIVS; i++) {
+        double angle = 2.0 * M_PI * i / NUM_DIVS;
+        sintheta[i] = sin(angle);
+        costheta[i] = cos(angle);
+    }
+    
+    for (int j = 0; j <= NUM_DIVS; j++) {
+        double angle = M_PI/2.0 - M_PI * j / NUM_DIVS;
+        sinphi[j] = sin(angle);
+        cosphi[j] = cos(angle);
+    }
+    /* Make sure it comes to a point */
+    cosphi[0] = 0;
+    cosphi[NUM_DIVS] = 0;
+    sintheta[NUM_DIVS] = sintheta[0];
+    costheta[NUM_DIVS] = costheta[0];
 
 	spawnShip();
 
@@ -639,44 +661,20 @@ void draw_ship() {
 // Modified from the glu source code for gluSphere() for a multi-textured unit sphere with normals
 void mySphere2()
 {
-    GLint i,j;
-    GLfloat sintheta[NUM_DIVS+1];
-    GLfloat costheta[NUM_DIVS+1];
-    GLfloat sinphi[NUM_DIVS+1];
-    GLfloat cosphi[NUM_DIVS+1];
-    GLfloat angle;
-    GLfloat sintemp1 = 0.0, sintemp2 = 0.0;
-    GLfloat costemp1 = 0.0, costemp2 = 0.0;
-    GLint slices = NUM_DIVS;
-    GLint stacks = NUM_DIVS;
-    GLfloat x,y,z;
-    GLfloat tangent[3];
+    int i,j;
+    float sintemp1 = 0.0, sintemp2 = 0.0;
+    float costemp1 = 0.0, costemp2 = 0.0;
+    float x,y,z;
+    float tangent[3];
     
-    for (i = 0; i < slices; i++) {
-        angle = 2.0 * M_PI * i / slices;
-        sintheta[i] = sin(angle);
-        costheta[i] = cos(angle);
-    }
-    
-    for (j = 0; j <= stacks; j++) {
-        angle = M_PI/2.0 - M_PI * j / stacks;
-        sinphi[j] = sin(angle);
-        cosphi[j] = cos(angle);
-    }
-    /* Make sure it comes to a point */
-    cosphi[0] = 0;
-    cosphi[stacks] = 0;
-    sintheta[slices] = sintheta[0];
-    costheta[slices] = costheta[0];
-    
-    for (j = 0; j < stacks; j++) {
+    for (j = 0; j < NUM_DIVS; j++) {
         sintemp1 = sinphi[j];
         sintemp2 = sinphi[j+1];
         costemp1 = cosphi[j];
         costemp2 = cosphi[j+1];
         
         glBegin(GL_QUAD_STRIP);
-        for (i = 0; i <= slices; i++) {
+        for (i = 0; i <= NUM_DIVS; i++) {
             // Compute coordinates
             x = costheta[i] * costemp1;
             y = sintheta[i] * costemp1;
@@ -686,13 +684,7 @@ void mySphere2()
             tangent[2] = costemp1;
             // Set vectors
             glNormal3f(x,y,z);
-            //   glMultiTexCoord2f(GL_TEXTURE0,s,t);
-            //   if(use_bump)
-            //   {
-            // TODO: Set tangent vector in shader
             glVertexAttrib3fv(ints[1], tangent);
-            
-            //   }
             glVertex3f(x,y,z);
           
           
@@ -705,13 +697,7 @@ void mySphere2()
             tangent[2] = costemp2;
             // Set vectors
             glNormal3f(x,y,z);
-            //  glMultiTexCoord2f(GL_TEXTURE0,s,t);
-            // if(use_bump)
-            // {
-            // TODO: Set tangent vector in shader
             glVertexAttrib3fv(ints[1], tangent);
-            
-            //}
             glVertex3f(x,y,z);
           
         }

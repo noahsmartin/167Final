@@ -85,6 +85,8 @@ Vector3 asteroids_vel[max_asteroids];
 
 Vector3 gravity(0, -0.002, 0);
 
+int score = 0;
+
 #define PI 3.14159
 #define DEG_TO_RAD (PI/180.0)
 #define ANG_STEP 10.0
@@ -127,6 +129,7 @@ void updateAsteroids() {
 				else { asteroids_vel[i].scale(-1); }
 				projectile_speeds[k].scale(0);
 				projectile[k].makeScale(0, 0, 0);
+                score += 50;
 			}
 		}
 		
@@ -162,6 +165,7 @@ void updateAsteroids() {
 		if ((position - jet).length() < (asteroids_radius + 2.5)) {
 			asteroid(i);
 			ship_respawn = 10;
+            score -= 100;
 		}
 
 		if (asteroids[i].getPointer()[3] < -75 || asteroids[i].getPointer()[7] < -20 ||
@@ -235,11 +239,27 @@ void loadOnceF() {
 	loadOnce = false;
 }
 
+long timeLast;
+int fps;
+
 void Window::idleCallback()
 {
     if(loadOnce) {
         loadOnceF();
     }
+    long ms;
+#ifdef __APPLE__
+    struct timeval tp;
+    gettimeofday(&tp, NULL);
+    ms = tp.tv_sec * 1000 + tp.tv_usec / 1000;
+#else
+    SYSTEMTIME tp;
+    GetLocalTime(&tp);
+    ms = tp.wSecond * 1000 + tp.wMilliseconds;
+#endif
+    fps = (int) (1000.0/(ms - timeLast));
+    timeLast = ms;
+
     displayCallback();         // call display routine to show the cube
   
   //Globals::shader = new Shader(BUMP_VERT_SHADER, BUMP_FRAG_SHADER);
@@ -791,6 +811,7 @@ void drawObjects(void)
 //int elapsedTimeCounter = 0;
 void update(void)
 {
+    
 	if (keystates[GLUT_KEY_LEFT]) {
 		if (firstperson)
 		{
@@ -835,7 +856,7 @@ void update(void)
 			mountains[i].generate();
 			startY = mountains[i].endY;
             
-            closeRange[i] = Mountain(4 * i - 20, 4, 2 + startYClose, 0, Vector3(0.5, 0.5, 0.5));
+            closeRange[i] = Mountain(4 * i - 20, 4, 2 + startYClose, 0, Vector3(0.8, 0.8, 0.8));
             closeRange[i].generate();
             startYClose = closeRange[i].endY;		}
 		    genMountains = false;
@@ -856,7 +877,7 @@ void update(void)
         for (int i = 0; i < num_mountains - 1; i++) {
             closeRange[i] = closeRange[i + 1];
         }
-        closeRange[num_mountains - 1] = Mountain(closeRange[num_mountains - 2].endX, 4, 2 + closeRange[num_mountains - 2].endY, 0, Vector3(0.5, 0.5, 0.5));
+        closeRange[num_mountains - 1] = Mountain(closeRange[num_mountains - 2].endX, 4, 2 + closeRange[num_mountains - 2].endY, 0, Vector3(0.8, 0.8, 0.8));
         closeRange[num_mountains - 1].generate();
     }
 
@@ -889,6 +910,18 @@ void update(void)
 		l_camera[1] = 5;
 		l_camera[2] = -10;
 	}
+}
+
+void output(int x, int y, float r, float g, float b, void* font, char *string)
+{
+    glColor3f( r, g, b );
+    glRasterPos2f(x, y);
+    
+    int len, i;
+    len = (int)strlen(string);
+    for (i = 0; i < len; i++) {
+        glutBitmapCharacter(font, (int)string[i]);
+    }
 }
 
 /*~~~~~~~~~~~~~~~~SHADOWS~~~~~~~~~~~~~~*/
@@ -999,6 +1032,12 @@ void Window::displayCallback()
 		closeRange[i].draw();
 	}
 	endTranslate();
+    
+    char buffer[20];
+    sprintf(buffer, "Score: %d", score);
+    output(-40, 30, 0, 1.0, 0.0, GLUT_BITMAP_HELVETICA_18, buffer);
+    sprintf(buffer, "FPS: %d", fps);
+    output(35, 30, 0, 1.0, 0.0, GLUT_BITMAP_HELVETICA_18, buffer);
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, 0);

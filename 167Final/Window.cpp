@@ -34,6 +34,7 @@ bool shader_enabled = true;
 
 Matrix4 model;
 Matrix4 ship;
+Matrix4 enemy;
 
 bool bounding_sphere = false;
 
@@ -72,11 +73,25 @@ void spawnShip() {
 	translate(ship, -25, 8, -10);
 }
 
+void spawnEnemy() {
+	enemy.makeRotateY(-90);
+	Matrix4 temp;
+	temp.makeScale(1, 1.0, 1);
+	enemy = temp * enemy;
+	translate(enemy, 25, 8, -10);
+}
+
 const int max_proj = 20;
 float proj_radius = 0.5;
 Matrix4 projectile[max_proj];
 Vector3 projectile_speeds[max_proj];
 int proj_index = 0;
+
+const int enemy_max_proj = 20;
+float enemy_proj_radius = 0.5;
+Matrix4 enemy_projectile[enemy_max_proj];
+Vector3 enemy_projectile_speeds[enemy_max_proj];
+int enemy_proj_index = 0;
 
 const int max_asteroids = 10;
 float asteroids_radius = 3;
@@ -213,6 +228,23 @@ void shoot() {
 		proj_index = 0;
 	}
 }
+
+
+
+void enemyShoot(Matrix4& enemy) {
+	enemy_projectile[enemy_proj_index].identity();
+	enemy_projectile[enemy_proj_index].getPointer()[3] = enemy.getPointer()[3];
+	enemy_projectile[enemy_proj_index].getPointer()[7] = enemy.getPointer()[7];
+	enemy_projectile[enemy_proj_index].getPointer()[11] = enemy.getPointer()[11];
+	enemy_projectile_speeds[enemy_proj_index] = Vector3(-1.2, 0, 0);
+	translate(enemy_projectile[enemy_proj_index++], -4, 0, 0);
+
+	if (enemy_proj_index == enemy_max_proj)
+	{
+		enemy_proj_index = 0;
+	}
+}
+
 
 const int max_particles = 10;
 const float particle_radius = 1;
@@ -659,6 +691,21 @@ void draw_ship() {
     endTranslate();
 }
 
+void draw_enemy() {
+	//drawParticles();
+
+	startModel(enemy);
+	glColor3d(1, 0, 1);
+	glutSolidCube(4);
+
+	if (bounding_sphere) {
+		glMatrixMode(GL_MODELVIEW);
+		glutWireSphere(3.5, 10, 10);
+	}
+
+	endTranslate();
+}
+
 // Modified from http://faculty.ycp.edu/~dbabcock/PastCourses/cs370/labs/lab22.html
 // Modified from the glu source code for gluSphere() for a multi-textured unit sphere with normals
 void mySphere2()
@@ -754,16 +801,32 @@ void drawObjects(void)
 //	glUseProgramObjectARB(0);
   draw_ship();
 
-	for (int i = 0; i < max_proj; i++) {
-		if (projectile[i].getPointer()[3] < 100)
-		{
-			startModel(projectile[i]);
-			glColor3d(0, 0, 1);
-			glutSolidSphere(proj_radius, 10, 10);
-			endTranslate();
-		}
-	}
+  for (int i = 0; i < max_proj; i++) {
+	  if (projectile[i].getPointer()[3] < 100)
+	  {
+		  startModel(projectile[i]);
+		  glColor3d(0, 0, 1);
+		  glutSolidSphere(proj_radius, 10, 10);
+		  endTranslate();
+	  }
+  }
 
+  spawnEnemy();
+  draw_enemy();
+  if (rand() % 100 > 90)
+  {
+	  enemyShoot(enemy);
+  }
+
+  for (int i = 0; i < enemy_max_proj; i++) {
+	  if (enemy_projectile[i].getPointer()[3] < 100)
+	  {
+		  startModel(enemy_projectile[i]);
+		  glColor3d(0, 0, 1);
+		  glutSolidSphere(enemy_proj_radius, 10, 10);
+		  endTranslate();
+	  }
+  }
   
   if (shader_enabled) {
     Globals::shader->bind();
@@ -835,7 +898,12 @@ void update(void)
 	for (int i = 0; i < max_proj; i++)
 	{
 		translate(projectile[i], projectile_speeds[i].x(), projectile_speeds[i].y(), 0);
-        projectile_speeds[i] = projectile_speeds[i] + gravity;
+		projectile_speeds[i] = projectile_speeds[i] + gravity;
+	}
+	for (int i = 0; i < enemy_max_proj; i++)
+	{
+		translate(enemy_projectile[i], enemy_projectile_speeds[i].x(), enemy_projectile_speeds[i].y(), 0);
+		enemy_projectile_speeds[i] = enemy_projectile_speeds[i] + gravity;
 	}
     updateAsteroids();
 

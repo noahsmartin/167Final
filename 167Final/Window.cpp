@@ -1069,7 +1069,7 @@ void Window::keyboardCallback(unsigned char key, int x, int y)
 {
         if(key == 's')
         {
-            asteroids_radius -= 5;
+           asteroids_radius -= 5;
 
         } else if(key == 'S')
         {
@@ -1101,9 +1101,7 @@ void Window::keyboardCallback(unsigned char key, int x, int y)
 			translate(model, 0, 0, 1);
         } else if(key == 'r')
         {
-            model.identity();
-			translate(model, 0, 0, -50);
-			spawnShip();
+            asteroids_radius = 3;
         } else if(key == 'g')
 		{
             genMountains = true;

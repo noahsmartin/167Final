@@ -131,7 +131,7 @@ void updateAsteroids() {
 			Vector3 proj(projectile[k].getPointer()[3], projectile[k].getPointer()[7], projectile[k].getPointer()[11]);
 			if ((position - proj).length() < (asteroids_radius + proj_radius) && projectile_speeds[k].x() != 0) {
 				if (!bouncing) { asteroid(i); }
-				else { asteroids_vel[i].scale(-1); }
+                else { asteroids_vel[i] = projectile_speeds[k]; }
 				projectile_speeds[k].scale(0);
 				projectile[k].makeScale(0, 0, 0);
                 score += 50;

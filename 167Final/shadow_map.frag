@@ -93,13 +93,11 @@ void main()
     gl_FragColor = shadow * color * intensity; 
 
 
-  vec3 eyePos, lightPos, EyeVert, LightVert, EyeLight;
+  vec3 eyePos, lightPos, EyeVert;
 
-  eyePos = vec3(0.0,0.0,10.0);
+  eyePos = vec3( 0, 10, 50);
   lightPos = vec3(light_pos.xyz);
-  EyeVert = normalize(eyePos - vVertex);
-  LightVert = normalize(lightPos - vVertex);
-  EyeLight = normalize(LightVert+EyeVert);
+  EyeVert = normalize(eyePos - vec3(position.xyz));
   // Simple Silhouette
   float sil;
   sil = max(dot(n,EyeVert), 0.0);

@@ -5,6 +5,9 @@ varying vec4 diffuse,ambientGlobal,ambient, position;
 varying vec3 normal,halfVector;
 
 varying vec3 vVertex;
+attribute float bias;
+
+varying float bias_t;
  
 void main()
 {   
@@ -23,6 +26,8 @@ void main()
     diffuse = gl_FrontMaterial.diffuse * gl_LightSource[0].diffuse;
     ambient = gl_FrontMaterial.ambient * gl_LightSource[0].ambient;
     ambientGlobal = gl_LightModel.ambient * gl_FrontMaterial.ambient;
+    
+    bias_t = bias;
 
     ShadowCoord = gl_TextureMatrix[7] * gl_Vertex;
   

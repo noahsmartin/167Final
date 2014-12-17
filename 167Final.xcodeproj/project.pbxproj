@@ -41,6 +41,8 @@
 		4F12AFD41A3F643B0005ABF5 /* bump_shader.vert */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = bump_shader.vert; sourceTree = "<group>"; };
 		4F12AFD51A3F647A0005ABF5 /* paths.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = paths.h; sourceTree = "<group>"; };
 		4F2623C81A3CD4AC002043B2 /* main.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = main.h; sourceTree = "<group>"; };
+		4F84D2A61A4164A800E0321B /* shadow_map.frag */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = shadow_map.frag; sourceTree = "<group>"; };
+		4F84D2A71A4164A800E0321B /* shadow_map.vert */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = shadow_map.vert; sourceTree = "<group>"; };
 		4F8F05BF1A3BAAA700EEC828 /* Mountain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Mountain.cpp; sourceTree = "<group>"; };
 		4F8F05C01A3BAAA700EEC828 /* Mountain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Mountain.h; sourceTree = "<group>"; };
 		4FF03BA31A3B75CE001EEFB0 /* 167Final */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = 167Final; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -108,6 +110,8 @@
 				4F12AFD21A3EAF100005ABF5 /* 3215-normal.jpg */,
 				4F12AFD31A3F642A0005ABF5 /* bump_shader.frag */,
 				4F12AFD41A3F643B0005ABF5 /* bump_shader.vert */,
+				4F84D2A61A4164A800E0321B /* shadow_map.frag */,
+				4F84D2A71A4164A800E0321B /* shadow_map.vert */,
 				4FF03BCE1A3B77EC001EEFB0 /* Camera.cpp */,
 				4FF03BCF1A3B77EC001EEFB0 /* Camera.h */,
 				4FF03BA61A3B75CE001EEFB0 /* main.cpp */,

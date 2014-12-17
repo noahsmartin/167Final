@@ -1,3 +1,5 @@
+#version 120
+
 uniform sampler2D ShadowMap;
 varying vec4 ShadowCoord;
 
@@ -6,6 +8,9 @@ varying vec3 normal,halfVector;
  
 
 varying vec3 vVertex;
+
+varying float bias_t;
+
 
 void main()
 {
@@ -46,7 +51,7 @@ void main()
 	vec4 shadowCoordinateWdivide = ShadowCoord / ShadowCoord.w ;
 	
 	// Used to lower moiré pattern and self-shadowing
-	shadowCoordinateWdivide.z += 0.0005 - 0.000555 ;
+	shadowCoordinateWdivide.z += bias_t ;
 	
 	float distanceFromLight = texture2D(ShadowMap,shadowCoordinateWdivide.st).z;
 	

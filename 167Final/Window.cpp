@@ -707,6 +707,8 @@ void mySphere2()
 
 void drawObjects(void)
 {
+    GLint id = glGetAttribLocationARB(shadowShaderId, "bias");
+    glVertexAttrib1f(id, 0.0005);
 	// Ground
 	glColor4f(0.3f, 0.3f, 0.3f, 1);
 	glBegin(GL_QUADS);
@@ -716,6 +718,7 @@ void drawObjects(void)
 	glVertex3f(75, -20, 15);
 	glVertex3f(75, -20, -35);
 	glEnd();
+    glVertexAttrib1f(id, -0.000055);
 
 	glColor4f(0.9f, 0.9f, 0.9f, 1);
 

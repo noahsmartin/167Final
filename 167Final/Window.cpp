@@ -40,6 +40,7 @@ Matrix4 ship;
 Matrix4 enemy;
 
 bool bounding_sphere = false;
+bool bezier = false;
 
 int ship_respawn = 0;
 int enemy_respawn = 0;
@@ -80,10 +81,10 @@ void spawnShip() {
 void spawnEnemy() {
 	enemyDead = false;
 	enemy_respawn = 0;
-	enemy.makeRotateY(-90);
-	Matrix4 temp;
-	temp.makeScale(1, 1.0, 1);
-	enemy = temp * enemy;
+	//enemy.makeRotateY(-90);
+	//Matrix4 temp;
+	//temp.makeScale(1, 1.0, 1);
+	//enemy = temp * enemy;
 	translate(enemy, 25, 8, -10);
 }
 
@@ -712,6 +713,90 @@ void draw_ship() {
     endTranslate();
 }
 
+
+Vector4 p0(25, 0, -15, 1);
+Vector4 p1(25, 3, -10, 1);
+Vector4 p2(25, -3, -5, 1);
+Vector4 p3(25, 0, 0, 1);
+Vector4 p4(25, 0, 0, 1);
+Vector4 p5(25, 3, 5, 1);
+Vector4 p6(25, -3, 10, 1);
+Vector4 p7(25, 0, 15, 1);
+
+void generateCurve()
+{
+	//p0 = Vector4()
+}
+
+long factorial(long n)
+{
+	long result = 1;
+
+	//If n is 0, by definition 0! is equal to 1
+	if (n <= 0)
+		return result;
+
+	//Calculate the factorial, n * n-1 * n-2 * ... * 1
+	for (long i = n; i > 0; --i)
+	{
+		result *= i;
+	}
+
+	return result;
+}
+
+long combo(long n, long i)
+{
+	//C(n, i) = n! / ((n-1)! * i!)
+	return factorial(n) / (factorial(n - i) * factorial(i));
+}
+
+double bernstizzlesCoeff(long n, long i, double t)
+{
+	//long n: is the degree of our curve, in the case of a cubic curve it is 3
+	//long i: the index of the Bernstein coefficient and the control point
+	//double t: is the time we are evaluating at
+
+	//Calculate the Bernstein coefficient
+	return combo(n, i) * pow(1.0 - t, n - i) * pow(t, i);
+}
+
+Vector4 Bez(double t, Vector4 p0, Vector4 p1, Vector4 p2, Vector4 p3)
+{
+	//Setup the control point matrix
+
+	double n[4][4] = { p0.v[0], p1.v[0], p2.v[0], p3.v[0],
+		p0.v[1], p1.v[1], p2.v[1], p3.v[1],
+		p0.v[2], p1.v[2], p2.v[2], p3.v[2],
+		0.0, 0.0, 0.0, 0.0 };
+
+	Matrix4 Mp;
+	for (int i = 0; i < 4; i++)
+	{
+		for (int k = 0; k < 4; k++)
+		{
+			Mp.m[i][k] = n[i][k];
+		}
+	}
+
+	//Mp.print("Mp");
+
+	//Create a vector with our Bernstein coefficients
+	Vector4 C(bernstizzlesCoeff(3, 0, t),
+		bernstizzlesCoeff(3, 1, t),
+		bernstizzlesCoeff(3, 2, t),
+		bernstizzlesCoeff(3, 3, t));
+
+	//Calculate the final point q
+	Vector4 q = Mp * C;
+
+	//And make sure q is a point by setting its w-component to 1
+	q.v[3] = 1.0;
+
+	return q;
+}
+
+
 void draw_enemy() {
 	if (enemy_respawn > 0) {
 		enemyDead = true;
@@ -729,7 +814,21 @@ void draw_enemy() {
 		}
 	}
 
-	translate(enemy, 0, -0.5 + (double)(rand() % 10) / 10, -0.5 + (double)(rand() % 10) / 10);
+	//translate(enemy, 0, -0.5 + (double)(rand() % 10) / 10, -0.5 + (double)(rand() % 10) / 10);
+	static double i = 0;
+	static double direction = 1;
+	Vector4 point;
+	if (i < 1)
+		point = Bez(i, p0, p1, p2, p3);
+	else
+		point = Bez(i - 1, p4, p5, p6, p7);
+	i += 0.01 * direction;
+	if (i >= 2 || i <= 0)
+	{
+		direction *= -1;
+	}
+	enemy.identity();
+	translate(enemy, 25, point.v[1], point.v[2]);
 
 	startModel(enemy);
 	glColor3d(1, 0, 1);
@@ -1210,6 +1309,28 @@ void Window::displayCallback()
     output(35, 30, 0, 1.0, 0.0, GLUT_BITMAP_HELVETICA_18, buffer);
     glPopMatrix();
 
+	if (bezier)
+	{
+		glPushMatrix();
+		for (double i = 0; i <= 1; i += 0.01)
+		{
+			Vector4 point = Bez(i, p0, p1, p2, p3);
+			Vector4 point2 = Bez(i, p4, p5, p6, p7);
+			// Draw green control points.
+			glColor3f(0.0, 1.0, 0.0);
+			glPointSize(5);
+			glBegin(GL_POINTS);
+			glVertex3d(point.v[0], point.v[1], point.v[2]);
+			glVertex3d(point2.v[0], point2.v[1], point2.v[2]);
+			/*glVertex3f(p0.v[0], p0.v[1], p0.v[2]);
+			glVertex3f(p1.v[0], p1.v[1], p1.v[2]);
+			glVertex3f(p2.v[0], p2.v[1], p2.v[2]);
+			glVertex3f(p3.v[0], p3.v[1], p3.v[2]);*/
+			glEnd();
+		}
+		glPopMatrix();
+	}
+
 	// DEBUG only. this piece of code draw the depth buffer onscreen
 	/*
 	glUseProgramObjectARB(0);
@@ -1291,6 +1412,10 @@ void Window::keyboardCallback(unsigned char key, int x, int y)
 		else if (key == 'f')
 		{
 			firstperson = !firstperson;
+		}
+		else if (key == '1')
+		{
+			bezier = !bezier;
 		}
 }
 

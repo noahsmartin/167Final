@@ -34,7 +34,7 @@
 #include "main.h"
 
 namespace Globals {
-    GLuint textures[3] = {0};
+    GLuint textures[4] = {0};
     Shader* shader;
 }
 
@@ -43,7 +43,7 @@ void loadTexture() {
     unsigned char* data;
     int width, height;
     
-    glGenTextures(3, &Globals::textures[0]);
+    glGenTextures(4, &Globals::textures[0]);
     
     data = SOIL_load_image(BG_PATH,  &width, &height, &channels, SOIL_LOAD_AUTO);
     
@@ -67,6 +67,19 @@ void loadTexture() {
     data = (unsigned char *) SOIL_load_image(BUMP_MAP, &width, &height, &channels, SOIL_LOAD_AUTO);
     
     glBindTexture( GL_TEXTURE_2D, Globals::textures[2] ); //bind the texture to it’s array
+    glTexImage2D(GL_TEXTURE_2D, 0, 3, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+    // Make sure no bytes are padded:
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    
+    // Select GL_MODULATE to mix texture with polygon color for shading:
+    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+    
+    // Use bilinear interpolation:
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    
+    data = (unsigned char *) SOIL_load_image(JURGEN, &width, &height, &channels, SOIL_LOAD_AUTO);
+    glBindTexture( GL_TEXTURE_2D, Globals::textures[3] ); //bind the texture to it’s array
     glTexImage2D(GL_TEXTURE_2D, 0, 3, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
     // Make sure no bytes are padded:
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);

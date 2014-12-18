@@ -734,12 +734,16 @@ void draw_enemy() {
 	startModel(enemy);
 	glColor3d(1, 0, 1);
 
-	//glEnable(GL_TEXTURE_GEN_S); //enable texture coordinate generation
-	//glEnable(GL_TEXTURE_GEN_T);
-	//glBindTexture(GL_TEXTURE_2D, Globals::textures[0]);
+    glEnable(GL_TEXTURE_2D);
+    glActiveTexture(GL_TEXTURE1);
+	glEnable(GL_TEXTURE_GEN_S); //enable texture coordinate generation
+	glEnable(GL_TEXTURE_GEN_T);
+	glBindTexture(GL_TEXTURE_2D, Globals::textures[2]);
 	glutSolidCube(4);
-	//glDisable(GL_TEXTURE_GEN_S); //enable texture coordinate generation
-	//glDisable(GL_TEXTURE_GEN_T);
+	glDisable(GL_TEXTURE_GEN_S); //enable texture coordinate generation
+	glDisable(GL_TEXTURE_GEN_T);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, 0);
 
 	if (bounding_sphere) {
 		glMatrixMode(GL_MODELVIEW);
@@ -924,7 +928,6 @@ void update(void)
 		}
 		else
 		{
-			if (ship.getPointer()[3] > -50)
 			translate(ship, -1, 0, 0);
 		}
 	}
@@ -1152,7 +1155,11 @@ void Window::displayCallback()
     
     glActiveTexture(GL_TEXTURE0);
     glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, Globals::textures[0]);
+    if(!box_1 || !box_2) {
+        glBindTexture(GL_TEXTURE_2D, Globals::textures[3]);
+    } else {
+        glBindTexture(GL_TEXTURE_2D, Globals::textures[0]);
+    }
     glUseProgramObjectARB(0);
     glDisable(GL_LIGHTING);
     glBegin(GL_QUADS);

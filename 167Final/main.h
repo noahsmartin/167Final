@@ -17,7 +17,7 @@
 #include "shader.h"
 
 namespace Globals {
-    extern GLuint textures[3];
+    extern GLuint textures[4];
     extern Shader* shader;
 }
 

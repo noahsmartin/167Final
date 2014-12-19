@@ -976,7 +976,7 @@ void drawObjects(void)
 	  if (enemy_projectile[i].getPointer()[3] < 100)
 	  {
 		  startModel(enemy_projectile[i]);
-		  glColor3d(0, 0, 1);
+		  glColor3d(1, 1, 0);
 		  glutSolidSphere(enemy_proj_radius, 10, 10);
 		  endTranslate();
 	  }
